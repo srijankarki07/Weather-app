@@ -14,7 +14,7 @@ import thunder_icon from "./Assets/thunderstrom.png";
 import broken_icon from "./Assets/broken.png";
 
 const Weather = () => {
-  const api_key = "d184d4140463a0262b79ee3343105d4a";
+  const api_key = process.env.REACT_APP_OPENWEATHER_API_KEY;
   const [wicon, setWicon] = useState("");
   const [weatherDescription, setWeatherDescription] = useState(""); // New state for description
   const [location, setLocation] = useState("");
