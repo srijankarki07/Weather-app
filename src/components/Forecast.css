@@ -1,0 +1,31 @@
+/* Forecast.css */
+
+.forecast {
+  margin: 20px 0;
+  width: 350px;
+  padding-left: 20px;
+  background: #17747b;
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4.9px);
+  -webkit-backdrop-filter: blur(4.9px);
+  border: 1px solid rgba(33, 150, 144, 0.33);
+}
+
+.forecast h2 {
+  text-align: center;
+  color: antiquewhite;
+}
+
+.forecast-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  /* background: #ffffff; */
+}
+
+.forecast-item p {
+  margin: 0;
+  /* font-size: 18px; */
+  color: antiquewhite;
+}
