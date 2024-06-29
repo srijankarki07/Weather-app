@@ -26,6 +26,9 @@
   padding: 0 10px;
   /* width: 100%; */
 }
+.input.input {
+  width: 100%;
+}
 
 .cur-location {
   font-size: 18px;
