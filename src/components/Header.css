@@ -11,26 +11,22 @@
   display: flex;
   justify-content: space-between;
   gap: 14px;
-  color: #727576;
   flex-direction: row;
   padding: 10px 20px;
   border-radius: 28px;
-  background: #d3d7dd;
+  background: #ffffff;
   height: 30px;
   width: 25rem;
 }
 
 .input {
-  border: 1px solid #d3d7dd;
+  border: 1px solid #ffffff;
   font-size: 15px;
   outline: none;
   padding: 0 10px;
   /* width: 100%; */
 }
 
-.input.input {
-  background: #d3d7dd;
-}
 .cur-location {
   font-size: 18px;
   color: #d3d7dd;
