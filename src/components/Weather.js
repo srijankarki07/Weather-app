@@ -1,115 +1,226 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "./Weather.css";
-import search_icon from "./Assets/search.png";
-import clear_icon from "./Assets/clear.png";
-import cloud_icon from "./Assets/cloud.png";
-import drizzle_icon from "./Assets/drizzle.png";
-import rain_icon from "./Assets/rain.png";
-import snow_icon from "./Assets/snow.png";
 import wind_icon from "./Assets/wind.png";
-import moon_icon from "./Assets/moon.png";
 import humidity_icon from "./Assets/humidity.png";
-import mist_icon from "./Assets/mist.png";
-import thunder_icon from "./Assets/thunderstrom.png";
-import broken_icon from "./Assets/broken.png";
+import visibility_icon from "./Assets/visibility.png";
+import sunrise_icon from "./Assets/sunrise.png";
+import sunset_icon from "./Assets/sunset.png";
+import feels_like_icon from "./Assets/feels_like.png";
+import air_icon from "./Assets/air.png";
 
-const Weather = () => {
-  const api_key = process.env.REACT_APP_OPENWEATHER_API_KEY;
-  const [wicon, setWicon] = useState("");
-  const [weatherDescription, setWeatherDescription] = useState(""); // New state for description
-  const [location, setLocation] = useState("");
-  const [temperature, setTemperature] = useState("");
-  const [humidity, setHumidity] = useState("");
-  const [wind, setWind] = useState("");
-  const [loading, setLoading] = useState(true);
+function getAQIColor(aqi) {
+  if (aqi <= 50) {
+    return "white"; // Good
+  } else if (aqi <= 100) {
+    return "yellow"; // Moderate
+  } else if (aqi <= 150) {
+    return "orange"; // Unhealthy for Sensitive Groups
+  } else if (aqi <= 200) {
+    return "red"; // Unhealthy
+  } else if (aqi <= 300) {
+    return "purple"; // Very Unhealthy
+  } else {
+    return "maroon"; // Hazardous
+  }
+}
 
-  const fetchWeather = async (city) => {
-    setLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=Metric&appid=${api_key}`
-      );
-      const data = await response.json();
-      setTemperature(Math.floor(data.main.temp) + " °C");
-      setLocation(data.name);
-      setHumidity(data.main.humidity + " %");
-      setWind(data.wind.speed + " Km/h");
-      const { icon, description } = getWeatherIcon(data.weather[0].icon); // Destructure icon and description
-      setWicon(icon);
-      setWeatherDescription(description); // Set the description state
-    } catch (error) {
-      console.error("Failed to fetch weather data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+function getAQIText(aqi) {
+  if (aqi <= 50) {
+    return "Good";
+  } else if (aqi <= 100) {
+    return "Moderate";
+  } else if (aqi <= 150) {
+    return "Unhealthy for Sensitive Groups";
+  } else if (aqi <= 200) {
+    return "Unhealthy";
+  } else if (aqi <= 300) {
+    return "Very Unhealthy";
+  } else {
+    return "Hazardous";
+  }
+}
 
-  useEffect(() => {
-    fetchWeather("Kathmandu");
-  }, [api_key]);
+const WeatherInfoItem = ({ label, icon, value }) => (
+  <div className="parameters">
+    <p className="title" style={{ color: "#ffffff " }}>
+      {label}
+    </p>
+    <div className="paraRow">
+      <img src={icon} alt={`${label} Icon`} width="40px" height="40px" />
+      <p>{value}</p>
+    </div>
+  </div>
+);
 
-  const getWeatherIcon = (iconCode) => {
-    const iconMap = {
-      "01d": { icon: clear_icon, description: "Clear Sky" },
-      "01n": { icon: moon_icon, description: "Clear Sky" },
-      "02d": { icon: cloud_icon, description: "Few Clouds" },
-      "02n": { icon: cloud_icon, description: "Few Clouds" },
-      "03d": { icon: broken_icon, description: "Scattered Clouds" },
-      "03n": { icon: broken_icon, description: "Scattered Clouds" },
-      "04d": { icon: broken_icon, description: "Broken Clouds" },
-      "04n": { icon: broken_icon, description: "Broken Clouds" },
-      "09d": { icon: drizzle_icon, description: "Shower Rain" },
-      "09n": { icon: drizzle_icon, description: "Shower Rain" },
-      "10d": { icon: rain_icon, description: "Rain" },
-      "10n": { icon: rain_icon, description: "Rain" },
-      "11d": { icon: thunder_icon, description: "Thunderstorm" },
-      "11n": { icon: thunder_icon, description: "Thunderstorm" },
-      "13d": { icon: snow_icon, description: "Snow" },
-      "13n": { icon: snow_icon, description: "Snow" },
-      "50d": { icon: mist_icon, description: "Mist" },
-      "50n": { icon: mist_icon, description: "Mist" },
-    };
-    return iconMap[iconCode] || { icon: clear_icon, description: "Clear Sky" };
-  };
-
+const Weather = ({
+  loading,
+  wicon,
+  weatherDescription,
+  temperature,
+  feelsLike,
+  location,
+  humidity,
+  pressure,
+  visibility,
+  wind,
+  sunrise,
+  sunset,
+  airPollution,
+}) => {
+  const weatherData = [
+    { label: "Feels Like", icon: feels_like_icon, value: feelsLike },
+    { label: "Humidity", icon: humidity_icon, value: humidity },
+    // { label: "Pressure", icon: pressure_icon, value: pressure },
+    { label: "Visibility", icon: visibility_icon, value: visibility },
+    { label: "Wind", icon: wind_icon, value: wind },
+  ];
   return (
-    <div className="container">
+    <div>
       {loading ? (
-        <div>Loading...</div>
+        <div className="loading">Loading...</div>
       ) : (
         <>
-          <div className="title">Real-Time Weather App with React</div>
-          <div className="top-bar">
-            <input type="text" className="city" placeholder="Search" />
-            <div
-              className="search_icon"
-              onClick={() =>
-                fetchWeather(document.querySelector(".city").value)
-              }
-            >
-              <img src={search_icon} alt="Search" />
-            </div>
-          </div>
-          <div className="weather-image">
-            <img src={wicon} alt="Weather Icon" />
-          </div>
-          <div className="description">{weatherDescription}</div>
+          <div className="current-weather">
+            <div className="weather-info">
+              <div
+                className="additional-info"
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-around",
+                }}
+              >
+                <h1 className="title">Today's Highlights</h1>
+                <div className="aqi">
+                  <div className="air-pollution">
+                    <div className="titleRow">
+                      <h2 style={{ textAlign: "left" }}>Air Quality Index</h2>
+                      <div className="aqiIndex">
+                        {airPollution.main?.aqi && (
+                          <p
+                            style={{
+                              color: getAQIColor(airPollution.main.aqi),
+                              fontSize: "24px",
+                            }}
+                          >
+                            {getAQIText(airPollution.main.aqi)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="aqilevel">
+                      <div className="image">
+                        <img
+                          src={air_icon}
+                          alt="air Icon"
+                          width="60px"
+                          height="60px"
+                        />
+                      </div>
+                      <div className="aqiValues">
+                        <div
+                          className="labels"
+                          style={{
+                            display: "flex",
+                            gap: "15%",
+                          }}
+                        >
+                          <p>AQI</p>
+                          <p>NO2</p>
+                          <p>O3</p>
+                          <p>SO2</p>
+                          <p>PM2.5</p>
+                        </div>
+                        <div
+                          className="values"
+                          style={{
+                            display: "flex",
+                            gap: "17%",
+                            marginLeft: "7px",
+                          }}
+                        >
+                          <p>{airPollution.main?.aqi}</p>
+                          <p>{airPollution.components?.no2}</p>
+                          <p>{airPollution.components?.o3}</p>
+                          <p>{airPollution.components?.so2}</p>
+                          <p>{airPollution.components?.pm2_5}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="sunrise-sunset">
+                    <h2 style={{ textAlign: "left" }}>Sunrise and Sunset</h2>
+                    <div className="sunrise-sunset-info">
+                      <div className="info">
+                        <p
+                          style={{
+                            alignContent: "left",
+                          }}
+                        >
+                          Sunrise
+                        </p>
+                        <div
+                          style={{
+                            textAlign: "center",
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <img
+                            src={sunrise_icon}
+                            alt="Sunrise Icon"
+                            width="60px"
+                            height="60px"
+                          />
+                          <p
+                            style={{
+                              alignContent: "center",
+                              marginLeft: "20px",
+                            }}
+                          >
+                            {sunrise}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="info">
+                        <p style={{ alignContent: "left" }}>Sunset</p>
+                        <div
+                          style={{
+                            textAlign: "center",
+                            display: "flex",
+                            justifyContent: "space-between",
+                          }}
+                        >
+                          <img
+                            src={sunset_icon}
+                            alt="Sunset Icon"
+                            width="60px"
+                            height="60px"
+                          />
+                          <p
+                            style={{
+                              alignContent: "center",
+                              marginLeft: "20px",
+                            }}
+                          >
+                            {sunset}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-          <div className="weather-temp">{temperature}</div>
-          <div className="weather-location">{location}</div>
-          <div className="data-container">
-            <div className="element">
-              <img src={humidity_icon} alt="Humidity Icon" className="icon" />
-              <div className="data">
-                <div>{humidity}</div>
-                <div className="text">Humidity</div>
-              </div>
-            </div>
-            <div className="element">
-              <img src={wind_icon} alt="Wind Icon" className="icon" />
-              <div className="data">
-                <div>{wind}</div>
-                <div className="text">Wind Speed</div>
+                <div className="weatherInfo">
+                  {weatherData.map((item, index) => (
+                    <WeatherInfoItem
+                      key={index}
+                      label={item.label}
+                      icon={item.icon}
+                      value={item.value}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
