@@ -73,6 +73,14 @@
   width: 100%;
 }
 
+.sunrise-sunset-icon {
+  display: flex;
+  flex-direction: row;
+  font-size: 18px;
+  gap: 20px;
+  margin-top: 20px;
+}
+
 .info img {
   width: 60px;
   height: 60px;
