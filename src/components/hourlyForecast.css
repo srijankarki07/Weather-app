@@ -13,6 +13,7 @@
   flex-direction: row;
   justify-content: space-between;
   padding: 10px;
+  gap: 40px;
 }
 
 .container-item {
@@ -28,6 +29,25 @@
   -webkit-backdrop-filter: blur(11.2px);
   border-radius: 28px;
 }
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 10px 10px 20px;
+}
+
+.pagination button {
+  background: #083a4d;
+  color: rgb(195, 180, 180);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.pagination button:hover {
+  background: #04242e;
+  color: #aab5b8;
+}
 
 @media (max-width: 768px) {
   .container {
@@ -35,13 +55,18 @@
     background: transparent;
   }
 
-  .separate {
+  /* .separate {
     width: 95%;
     display: flex;
     flex-wrap: wrap;
+  } */
+
+  .separate {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Single column grid */
+    gap: 2px; /* Adjust the gap between items in the grid */
   }
   .container-item {
-    width: 40%;
     margin-bottom: 1rem;
   }
 }

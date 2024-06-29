@@ -2,29 +2,40 @@ import React, { useState } from "react";
 import "./hourlyForecast.css";
 
 const HourlyForecast = ({ forecastData, wicon }) => {
-  const [selectedDay, setSelectedDay] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 5;
 
   if (!forecastData) return null;
 
-  const selectedDate = new Date(selectedDay);
-  selectedDate.setHours(0, 0, 0, 0);
+  const totalPages = Math.ceil(forecastData.list.length / itemsPerPage);
 
-  const forecastItems = forecastData.list.filter((item) => {
-    const itemDate = new Date(item.dt * 1000);
-    return itemDate.toDateString() === selectedDate.toDateString();
-  });
+  const handleNextPage = () => {
+    if (currentPage < totalPages - 1) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const forecastItems = forecastData.list.slice(
+    currentPage * itemsPerPage,
+    (currentPage + 1) * itemsPerPage
+  );
 
   return (
     <>
-      <h2 style={{ textAlign: "left", color: "#ffffff" }}>Today at</h2>
+      <h2 style={{ textAlign: "left", color: "#ffffff" }}>Hourly Forecast</h2>
       <div className="container">
         <div className="separate">
           {forecastItems.map((item) => (
             <div key={item.dt} className="container-item">
               <p>
                 {new Date(item.dt * 1000).toLocaleTimeString("en-US", {
+                  weekday: "short",
                   hour: "2-digit",
                 })}
               </p>
@@ -33,15 +44,14 @@ const HourlyForecast = ({ forecastData, wicon }) => {
             </div>
           ))}
         </div>
-        {/* <div className="day-selector">
-          <label htmlFor="day">Select a day: </label>
-          <input
-            type="date"
-            id="day"
-            value={selectedDay}
-            onChange={(e) => setSelectedDay(e.target.value)}
-          />
-        </div> */}
+        <div className="pagination">
+          {currentPage > 0 && (
+            <button onClick={handlePreviousPage}>Previous</button>
+          )}
+          {currentPage < totalPages - 1 && (
+            <button onClick={handleNextPage}>Next</button>
+          )}
+        </div>
       </div>
     </>
   );
