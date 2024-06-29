@@ -79,8 +79,8 @@ const Weather = ({
         <div className="loading">Loading...</div>
       ) : (
         <>
+          <h1 className="title">Today's Highlights</h1>
           <div className="additional-info">
-            <h1 className="title">Today's Highlights</h1>
             <div className="aqi">
               <div className="air-pollution">
                 <div className="titleRow">
