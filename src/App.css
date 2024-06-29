@@ -19,12 +19,12 @@
 
 @media (max-width: 786px) {
   .App {
-    width: 90%;
+    width: 95%;
   }
   .App-container {
     flex-direction: column;
     gap: 0.5rem;
-    width: 100%;
+    width: 98%;
   }
 
   .column {

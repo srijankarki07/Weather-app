@@ -9,20 +9,6 @@
   margin: 20px;
 }
 
-/* .current-weather {
-  display: flex;
-  width: 100%;
-  border-radius: 28px;
-} */
-
-/* .weather-info {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  gap: 5%;
-} */
-
 .weather-description {
   display: flex;
   flex-direction: column;
@@ -35,6 +21,7 @@
   height: 22rem;
   padding: 0 20px 0px 20px;
   text-align: center;
+  margin-top: 80px;
   color: #eaeaea;
 }
 
@@ -58,17 +45,11 @@
 
 .additional-info {
   display: flex;
-  width: 110%;
+  width: 90%;
   flex-direction: column;
   flex-wrap: wrap;
   gap: 10px;
   border-radius: 12px;
-  /* background: rgba(33, 150, 144, 0.65);
-  border-radius: 16px;
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(4.7px);
-  -webkit-backdrop-filter: blur(4.7px); */
-  /* From https://css.glass */
   background: rgb(8, 42, 59);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
