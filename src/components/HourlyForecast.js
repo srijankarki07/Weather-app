@@ -15,14 +15,10 @@ const HourlyForecast = ({ forecastData, wicon }) => {
     const itemDate = new Date(item.dt * 1000);
     return itemDate.toDateString() === selectedDate.toDateString();
   });
-  console.log(forecastItems, "hourltforecast");
 
   return (
     <>
-      <h2 style={{ textAlign: "left", color: "#ffffff" }}>
-        Today at
-        {/* 3-Hour Forecast for {selectedDate.toDateString()} */}
-      </h2>
+      <h2 style={{ textAlign: "left", color: "#ffffff" }}>Today at</h2>
       <div className="container">
         <div className="separate">
           {forecastItems.map((item) => (
@@ -30,19 +26,10 @@ const HourlyForecast = ({ forecastData, wicon }) => {
               <p>
                 {new Date(item.dt * 1000).toLocaleTimeString("en-US", {
                   hour: "2-digit",
-                  // minute: "2-digit",
                 })}
               </p>
               <img src={wicon} alt="Weather Icon" width="80px" height="80px" />
-              {/* <p> {item.weather[0].description}</p> */}
               <p>{Math.floor(item.main.temp)}°C</p>
-              {/* <p>
-            {new Date(item.dt * 1000).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              weekday: "long",
-            })}
-          </p> */}
             </div>
           ))}
         </div>

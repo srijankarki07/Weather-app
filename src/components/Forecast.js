@@ -8,8 +8,6 @@ const Forecast = ({ forecastData, wicon }) => {
     (item, index) => index % 8 === 0
   );
 
-  console.log(forecastItems, "forecast");
-
   return (
     <div className="forecast">
       <h2 style={{ textAlign: "left" }}>5 Days Forecast</h2>
@@ -28,7 +26,7 @@ const Forecast = ({ forecastData, wicon }) => {
 
           <p>
             {new Date(item.dt * 1000).toLocaleDateString("en-US", {
-              weekday: "long",
+              weekday: "short",
             })}
           </p>
         </div>
