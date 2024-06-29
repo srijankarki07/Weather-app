@@ -32,7 +32,6 @@
   backdrop-filter: blur(11.2px);
   -webkit-backdrop-filter: blur(11.2px);
   border-radius: 12px;
-  width: 110%;
   height: 22rem;
   padding: 0 20px 0px 20px;
   text-align: center;
@@ -59,7 +58,7 @@
 
 .additional-info {
   display: flex;
-  width: 100%;
+  width: 110%;
   flex-direction: column;
   flex-wrap: wrap;
   gap: 10px;
@@ -231,7 +230,7 @@
   .weather-description {
     width: 95%;
     margin-bottom: 20px;
-    background: rgba(33, 150, 144, 0.29);
+    background: #09374e;
   }
 
   .additional-info {
