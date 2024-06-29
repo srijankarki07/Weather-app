@@ -23,15 +23,20 @@ const Now = ({
       <div className="description">{weatherDescription}</div>
       <hr style={{ width: "100%" }} />
       <div style={{ display: "flex", gap: "0.5rem" }}>
-        <img src={locationIcon} width="20px" height="20px" />
+        <img
+          src={locationIcon}
+          alt="Location Icon"
+          width="20px"
+          height="20px"
+        />
         <div className="location">{location}</div>
       </div>
       <div style={{ display: "flex", gap: "0.5rem" }}>
-        <img src={dateIcon} width="20px" height="20px" />
+        <img src={dateIcon} alt="Date Icon" width="20px" height="20px" />
         <div className="location">{date}</div>
       </div>
       <div style={{ display: "flex", gap: "0.5rem" }}>
-        <img src={timeIcon} width="20px" height="20px" />
+        <img src={timeIcon} alt="Time Icon" width="20px" height="20px" />
         <div className="location">{time}</div>
       </div>
     </div>

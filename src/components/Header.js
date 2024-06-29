@@ -1,5 +1,6 @@
 import React, { useRef } from "react";
 import search_icon from "./Assets/search.png";
+import "./Header.css";
 
 const Header = ({ fetchWeatherByCoords, fetchWeatherByName }) => {
   const cityInputRef = useRef(null);
@@ -18,50 +19,21 @@ const Header = ({ fetchWeatherByCoords, fetchWeatherByName }) => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        // flexDirection: "column",
-        margin: "30px 0 ",
-        height: "50px",
-        justifyContent: "space-between",
-        width: "100%",
-      }}
-    >
+    <div className="header">
       <div
         style={{
           fontSize: "25px",
           fontWeight: "bold",
-          color: "#ebfffc",
+          color: "#d3d7dd",
         }}
       >
         Mausam app
       </div>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "14px",
-          color: "#727576",
-          flexDirection: "row",
-          padding: "10px 20px",
-          borderRadius: "28px",
-          background: "#FFFFFF",
-          height: "30px",
-          width: "25rem",
-          // width: "80%",
-        }}
-      >
+      <div className="search">
         <input
           type="text"
           ref={cityInputRef}
-          style={{
-            border: "1px solid #fff",
-            fontSize: "15px",
-            outline: "none",
-            padding: "0 10px",
-            width: "100%",
-          }}
+          className="input"
           placeholder="Search"
           onKeyPress={handleKeyPress}
         />
@@ -69,18 +41,7 @@ const Header = ({ fetchWeatherByCoords, fetchWeatherByName }) => {
           <img src={search_icon} alt="Search" style={{ cursor: "pointer" }} />
         </div>
       </div>
-      <div
-        onClick={fetchWeatherByCoords}
-        style={{
-          fontSize: "24px",
-          fontWeight: "bold",
-          color: "#ebfffc",
-          background: "#229954",
-          borderRadius: "20px",
-          padding: "10px 18px",
-          cursor: "pointer",
-        }}
-      >
+      <div onClick={fetchWeatherByCoords} className="cur-location">
         Current location
       </div>
     </div>

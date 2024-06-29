@@ -9,25 +9,24 @@
   margin: 20px;
 }
 
-.current-weather {
+/* .current-weather {
   display: flex;
   width: 100%;
   border-radius: 28px;
-}
+} */
 
-.weather-info {
+/* .weather-info {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   width: 100%;
   gap: 5%;
-  /* width: 60%; */
-}
+} */
 
 .weather-description {
-  background: #17747b;
   display: flex;
   flex-direction: column;
+  background: rgba(33, 150, 144, 0.65);
   gap: 10px;
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -60,6 +59,8 @@
 }
 
 .additional-info {
+  display: flex;
+  width: 100%;
   flex-direction: column;
   flex-wrap: wrap;
   gap: 10px;
@@ -69,7 +70,6 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4.7px);
   -webkit-backdrop-filter: blur(4.7px);
-  border: 1px solid rgba(33, 150, 144, 0.33);
   padding: 50px;
 }
 
@@ -83,7 +83,7 @@
 }
 
 .info {
-  text-align: center;
+  text-align: left;
   margin: 10px;
   width: 100%;
 }
@@ -107,7 +107,7 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4.9px);
   -webkit-backdrop-filter: blur(4.9px);
-  border: 1px solid rgba(33, 150, 144, 0.33);
+  /* border: 1px solid rgba(33, 150, 144, 0.33); */
   border-radius: 28px;
   color: #ffffff;
   padding: 20px;
@@ -141,12 +141,6 @@
   gap: 20%;
 }
 
-/* .image {
-  margin-right: 150px;
-  place-content: left;
-  justify-content: left;
-} */
-
 .aqiValues {
   display: flex;
   flex-direction: column;
@@ -159,7 +153,6 @@
 .label {
   text-align: right;
   padding-right: 10px;
-  font-weight: bold;
 }
 
 .value {
@@ -176,7 +169,7 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4.9px);
   -webkit-backdrop-filter: blur(4.9px);
-  border: 1px solid rgba(33, 150, 144, 0.33);
+  /* border: 1px solid rgba(33, 150, 144, 0.33); */
   border-radius: 28px;
   color: #ffffff;
   padding: 20px;
@@ -193,12 +186,12 @@
 }
 .weatherInfo {
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
-  flex-wrap: wrap;
   color: #ffffff;
   margin-top: 20px;
   font-size: larger;
-  gap: 0.5rem;
+  gap: 10%;
 }
 
 .parameters {
@@ -211,7 +204,7 @@
   border-radius: 16px;
   backdrop-filter: blur(4.9px);
   -webkit-backdrop-filter: blur(4.9px);
-  width: 11rem;
+  width: 10rem;
 
   /* height: 7rem; */
 }
@@ -234,10 +227,13 @@
   .weather-description {
     width: 95%;
     margin-bottom: 20px;
+    background: rgba(33, 150, 144, 0.29);
   }
 
   .additional-info {
     padding: 10px;
+    background: transparent;
+    width: 95%;
   }
 
   .air-pollution,
@@ -247,10 +243,37 @@
     margin-bottom: 20px;
   }
 
-  .weather-info {
+  .sunrise-sunset-info {
+    display: flex;
     flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .info {
+    text-align: left;
+    font-size: 20px;
+  }
+
+  .sunrise-sunset-icon {
+    display: flex;
+    flex-direction: row;
+    font-size: 18px;
+    gap: 20px;
+    margin-top: 20px;
+  }
+
+  .aqilevel {
+    width: 110%;
+    padding-right: 10px;
+  }
+  .labels {
+    gap: 10px;
+  }
+
+  .weatherInfo {
+    flex-wrap: wrap;
     gap: 15px;
-    /* margin: 50px; */
+    width: 100%;
   }
 
   .temperature {
@@ -270,7 +293,16 @@
   }
 
   .parameters {
-    width: 100%;
-    margin: 20px;
+    width: 35%;
+    /* margin: 20px; */
+  }
+  .paraRow {
+    align-items: center;
+    font-size: 18px;
+  }
+
+  .paraRow img {
+    width: 35px;
+    height: 35px;
   }
 }

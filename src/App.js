@@ -190,20 +190,14 @@ function App() {
   };
 
   return (
-    <div className="App" style={{ padding: "20px" }}>
+    <div className="App">
       <Header
         fetchWeatherByCoords={fetchWeatherByCoords}
         fetchWeatherByName={fetchWeatherByName}
       />
       {error && <div className="error">{error}</div>}
-      <div style={{ display: "flex", gap: "6rem" }}>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "4rem",
-          }}
-        >
+      <div className="App-container">
+        <div className="column" style={{ gap: "4rem" }}>
           <Now
             weatherDescription={weatherDescription}
             temperature={temperature}
@@ -214,7 +208,7 @@ function App() {
           />
           <Forecast forecastData={forecastData} wicon={wicon} />
         </div>
-        <div style={{ display: "flex", flexDirection: "column" }}>
+        <div className="column">
           <Weather
             loading={loading}
             wicon={wicon}

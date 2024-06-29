@@ -29,3 +29,11 @@
   /* font-size: 18px; */
   color: antiquewhite;
 }
+
+@media (max-width: 786px) {
+  .forecast {
+    width: 95%;
+    padding: 10px;
+    background: rgba(33, 150, 144, 0.29);
+  }
+}
