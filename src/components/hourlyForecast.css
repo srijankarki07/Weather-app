@@ -1,9 +1,9 @@
 .container {
-  background: rgba(33, 150, 144, 0.65);
+  background: rgb(8, 42, 59);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(4.7px);
-  -webkit-backdrop-filter: blur(4.7px);
+  backdrop-filter: blur(11.2px);
+  -webkit-backdrop-filter: blur(11.2px);
   height: auto;
   color: aliceblue;
   width: 100%;
@@ -21,10 +21,12 @@
   justify-content: space-between;
   padding: 10px;
   width: 150px;
-  background: rgba(33, 150, 144, 0.29);
+  background: rgb(9, 55, 78);
   border-radius: 16px;
-  backdrop-filter: blur(4.9px);
-  -webkit-backdrop-filter: blur(4.9px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(11.2px);
+  -webkit-backdrop-filter: blur(11.2px);
+  border-radius: 28px;
 }
 
 @media (max-width: 768px) {

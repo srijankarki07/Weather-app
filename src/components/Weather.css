@@ -26,12 +26,11 @@
 .weather-description {
   display: flex;
   flex-direction: column;
-  background: rgba(33, 150, 144, 0.65);
-  gap: 10px;
+  background: rgb(8, 42, 59);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(4.9px);
-  -webkit-backdrop-filter: blur(4.9px);
+  backdrop-filter: blur(11.2px);
+  -webkit-backdrop-filter: blur(11.2px);
   border-radius: 12px;
   width: 110%;
   height: 22rem;
@@ -65,11 +64,17 @@
   flex-wrap: wrap;
   gap: 10px;
   border-radius: 12px;
-  background: rgba(33, 150, 144, 0.65);
+  /* background: rgba(33, 150, 144, 0.65);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(4.7px);
-  -webkit-backdrop-filter: blur(4.7px);
+  -webkit-backdrop-filter: blur(4.7px); */
+  /* From https://css.glass */
+  background: rgb(8, 42, 59);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(11.2px);
+  -webkit-backdrop-filter: blur(11.2px);
   padding: 50px;
 }
 
@@ -102,12 +107,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(33, 150, 144, 0.29);
+  background: rgb(9, 55, 78);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(4.9px);
-  -webkit-backdrop-filter: blur(4.9px);
-  /* border: 1px solid rgba(33, 150, 144, 0.33); */
+  backdrop-filter: blur(11.2px);
+  -webkit-backdrop-filter: blur(11.2px);
   border-radius: 28px;
   color: #ffffff;
   padding: 20px;
@@ -164,12 +168,11 @@
   justify-content: center;
   /* align-items: center; */
   flex-direction: column;
-  background: rgba(33, 150, 144, 0.29);
+  background: rgb(9, 55, 78);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(4.9px);
-  -webkit-backdrop-filter: blur(4.9px);
-  /* border: 1px solid rgba(33, 150, 144, 0.33); */
+  backdrop-filter: blur(11.2px);
+  -webkit-backdrop-filter: blur(11.2px);
   border-radius: 28px;
   color: #ffffff;
   padding: 20px;
@@ -200,10 +203,11 @@
   padding: 0 15px 5px 15px;
   flex-wrap: wrap;
   color: #ffffff;
-  background: rgba(33, 150, 144, 0.29);
+  background: rgb(9, 55, 78);
   border-radius: 16px;
-  backdrop-filter: blur(4.9px);
-  -webkit-backdrop-filter: blur(4.9px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(11.2px);
+  -webkit-backdrop-filter: blur(11.2px);
   width: 10rem;
 
   /* height: 7rem; */

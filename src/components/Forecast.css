@@ -2,32 +2,36 @@
 
 .forecast {
   margin: 20px 0;
-  width: 350px;
-  padding-left: 20px;
-  background: #17747b;
+  width: 300px;
+  padding: 20px;
+  background: rgb(8, 42, 59);
   border-radius: 16px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(4.9px);
-  -webkit-backdrop-filter: blur(4.9px);
-  border: 1px solid rgba(33, 150, 144, 0.33);
+  backdrop-filter: blur(11.2px);
+  -webkit-backdrop-filter: blur(11.2px);
 }
 
 .forecast h2 {
   text-align: center;
-  color: antiquewhite;
+  color: #ffffff;
 }
 
 .forecast-item {
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  /* background: #ffffff; */
 }
 
 .forecast-item p {
   margin: 0;
   /* font-size: 18px; */
-  color: antiquewhite;
+  color: #ffffff;
+}
+
+.align {
+  align-items: center;
+  display: flex;
+  gap: 10px;
 }
 
 @media (max-width: 786px) {

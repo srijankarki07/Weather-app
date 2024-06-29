@@ -13,9 +13,9 @@ const Forecast = ({ forecastData, wicon }) => {
       <h2 style={{ textAlign: "left" }}>5 Days Forecast</h2>
       {forecastItems.map((item) => (
         <div key={item.dt} className="forecast-item">
-          <p>
-            {Math.floor(item.main.temp)}°C
+          <p className="align">
             <img src={wicon} alt="Weather Icon" width="40px" height="40px" />
+            {Math.floor(item.main.temp)}°C
           </p>
           <p>
             {new Date(item.dt * 1000).toLocaleDateString("en-US", {
