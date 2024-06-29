@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  background: #0c0c0c;
+  /* padding: "50px"; */
 }
 
 .App-logo {
@@ -14,7 +16,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #0d1717;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -36,3 +38,52 @@
     transform: rotate(360deg);
   }
 }
+
+/* src/App.css */
+/* 
+body {
+  font-family: Arial, sans-serif;
+  background: #2e2e2e;
+  color: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.weather-app {
+  background: #3e3e3e;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+}
+
+.search input {
+  width: calc(100% - 50px);
+  padding: 5px;
+}
+
+.search button {
+  padding: 5px;
+}
+
+.current-weather, .highlights, .forecast {
+  margin-top: 20px;
+}
+
+.highlights div, .forecast div {
+  background: #4e4e4e;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.forecast-item {
+  background: #4e4e4e;
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+}
+ */
