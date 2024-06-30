@@ -4,6 +4,9 @@ import "./hourlyForecast.css";
 const HourlyForecast = ({ forecastData, wicon }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const itemsPerPage = 5;
+  const containerRef = React.useRef(null);
+  let startX = 0;
+  let endX = 0;
 
   if (!forecastData) return null;
 
@@ -21,6 +24,19 @@ const HourlyForecast = ({ forecastData, wicon }) => {
     }
   };
 
+  const handleSwipeStart = (event) => {
+    startX = event.touches[0].clientX;
+  };
+
+  const handleSwipeEnd = (event) => {
+    endX = event.changedTouches[0].clientX;
+    if (startX - endX > 50) {
+      handleNextPage();
+    } else if (endX - startX > 50) {
+      handlePreviousPage();
+    }
+  };
+
   const forecastItems = forecastData.list.slice(
     currentPage * itemsPerPage,
     (currentPage + 1) * itemsPerPage
@@ -29,7 +45,12 @@ const HourlyForecast = ({ forecastData, wicon }) => {
   return (
     <>
       <h2 style={{ textAlign: "left", color: "#ffffff" }}>Hourly Forecast</h2>
-      <div className="container">
+      <div
+        className="container"
+        ref={containerRef}
+        onTouchStart={handleSwipeStart}
+        onTouchEnd={handleSwipeEnd}
+      >
         <div className="separate">
           {forecastItems.map((item) => {
             const iconCode = item.weather[0].icon;
@@ -54,14 +75,14 @@ const HourlyForecast = ({ forecastData, wicon }) => {
             );
           })}
         </div>
-        <div className="pagination">
-          {currentPage > 0 && (
-            <button onClick={handlePreviousPage}>Previous</button>
-          )}
-          {currentPage < totalPages - 1 && (
-            <button onClick={handleNextPage}>Next</button>
-          )}
-        </div>
+      </div>
+      <div className="pagination">
+        {currentPage > 0 && (
+          <button onClick={handlePreviousPage}>Previous</button>
+        )}
+        {currentPage < totalPages - 1 && (
+          <button onClick={handleNextPage}>Next</button>
+        )}
       </div>
     </>
   );
