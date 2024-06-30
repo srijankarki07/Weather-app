@@ -4,15 +4,6 @@ import Header from "./components/Header";
 import Weather from "./components/Weather";
 import Forecast from "./components/Forecast";
 import HourlyForecast from "./components/HourlyForecast";
-import clear_icon from "./components/Assets/clear.png";
-import cloud_icon from "./components/Assets/cloud.png";
-import drizzle_icon from "./components/Assets/drizzle.png";
-import rain_icon from "./components/Assets/rain.png";
-import snow_icon from "./components/Assets/snow.png";
-import moon_icon from "./components/Assets/moon.png";
-import mist_icon from "./components/Assets/mist.png";
-import thunder_icon from "./components/Assets/thunderstrom.png";
-import broken_icon from "./components/Assets/broken.png";
 import Now from "./components/Now";
 
 function App() {
@@ -135,8 +126,6 @@ function App() {
         new Date(weatherData.dt * 1000).toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
         })
       );
       setDate(
@@ -155,6 +144,26 @@ function App() {
       const { icon, description } = getWeatherIcon(weatherData.weather[0].icon);
       setWicon(icon);
       setWeatherDescription(description);
+
+      // Fetch forecast data
+      const forecastResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${weatherData.coord.lat}&lon=${weatherData.coord.lon}&units=metric&appid=${api_key}`
+      );
+      if (!forecastResponse.ok) {
+        throw new Error(`Error: ${forecastResponse.statusText}`);
+      }
+      const forecastData = await forecastResponse.json();
+      setForecastData(forecastData);
+
+      // Fetch air pollution data
+      const airPollutionResponse = await fetch(
+        `https://api.openweathermap.org/data/2.5/air_pollution?lat=${weatherData.coord.lat}&lon=${weatherData.coord.lon}&appid=${api_key}`
+      );
+      if (!airPollutionResponse.ok) {
+        throw new Error(`Error: ${airPollutionResponse.statusText}`);
+      }
+      const airPollutionData = await airPollutionResponse.json();
+      setAirPollution(airPollutionData.list[0]);
     } catch (error) {
       console.error("Failed to fetch weather data:", error);
       setError(error.message);
@@ -166,27 +175,34 @@ function App() {
   }, []);
 
   const getWeatherIcon = (iconCode) => {
-    const iconMap = {
-      "01d": { icon: clear_icon, description: "Clear Sky" },
-      "01n": { icon: moon_icon, description: "Clear Sky" },
-      "02d": { icon: cloud_icon, description: "Few Clouds" },
-      "02n": { icon: cloud_icon, description: "Few Clouds" },
-      "03d": { icon: broken_icon, description: "Scattered Clouds" },
-      "03n": { icon: broken_icon, description: "Scattered Clouds" },
-      "04d": { icon: broken_icon, description: "Broken Clouds" },
-      "04n": { icon: broken_icon, description: "Broken Clouds" },
-      "09d": { icon: drizzle_icon, description: "Shower Rain" },
-      "09n": { icon: drizzle_icon, description: "Shower Rain" },
-      "10d": { icon: rain_icon, description: "Rain" },
-      "10n": { icon: rain_icon, description: "Rain" },
-      "11d": { icon: thunder_icon, description: "Thunderstorm" },
-      "11n": { icon: thunder_icon, description: "Thunderstorm" },
-      "13d": { icon: snow_icon, description: "Snow" },
-      "13n": { icon: snow_icon, description: "Snow" },
-      "50d": { icon: mist_icon, description: "Mist" },
-      "50n": { icon: mist_icon, description: "Mist" },
+    const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
+
+    const weatherDescriptions = {
+      "01d": "Clear sky",
+      "01n": "Clear sky",
+      "02d": "Few clouds",
+      "02n": "Few clouds",
+      "03d": "Scattered clouds",
+      "03n": "Scattered clouds",
+      "04d": "Broken clouds",
+      "04n": "Broken clouds",
+      "09d": "Shower rain",
+      "09n": "Shower rain",
+      "10d": "Rain",
+      "10n": "Rain",
+      "11d": "Thunderstorm",
+      "11n": "Thunderstorm",
+      "13d": "Snow",
+      "13n": "Snow",
+      "50d": "Mist",
+      "50n": "Mist",
     };
-    return iconMap[iconCode] || { icon: clear_icon, description: "Clear Sky" };
+
+    let description = weatherDescriptions[iconCode] || "Weather conditions";
+
+    description = description.replace(/\b\w/g, (char) => char.toUpperCase());
+
+    return { icon: iconUrl, description };
   };
 
   return (
@@ -226,6 +242,7 @@ function App() {
             forecast={forecastData}
             airPollution={airPollution}
           />
+
           <HourlyForecast
             forecastData={forecastData}
             style={{ width: "100%" }}
