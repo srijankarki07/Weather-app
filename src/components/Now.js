@@ -18,7 +18,12 @@ const Now = ({
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div className="temperature">{temperature}</div>
 
-          <img src={wicon} alt="Weather Icon" width="80px" height="80px" />
+          <img
+            src={wicon}
+            alt={weatherDescription}
+            width="80px"
+            height="80px"
+          />
         </div>
 
         <div className="description">{weatherDescription}</div>

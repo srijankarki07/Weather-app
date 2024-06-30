@@ -54,13 +54,9 @@ const WeatherInfoItem = ({ label, icon, value }) => (
 
 const Weather = ({
   loading,
-  wicon,
-  weatherDescription,
-  temperature,
   feelsLike,
   location,
   humidity,
-  pressure,
   visibility,
   wind,
   sunrise,
@@ -79,7 +75,8 @@ const Weather = ({
         <div className="loading">Loading...</div>
       ) : (
         <>
-          <h1 className="title">Today's Highlights</h1>
+          <h1 className="title">Today's Highlights in {location}</h1>
+
           <div className="additional-info">
             <div className="aqi">
               <div className="air-pollution">

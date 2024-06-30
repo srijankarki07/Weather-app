@@ -1,7 +1,7 @@
 import React from "react";
 import "./Forecast.css";
 
-const Forecast = ({ forecastData, wicon }) => {
+const Forecast = ({ forecastData }) => {
   if (!forecastData) return null;
 
   const forecastItems = forecastData.list.filter(
@@ -11,26 +11,35 @@ const Forecast = ({ forecastData, wicon }) => {
   return (
     <div className="forecast">
       <h2 style={{ textAlign: "left" }}>5 Days Forecast</h2>
-      {forecastItems.map((item) => (
-        <div key={item.dt} className="forecast-item">
-          <p className="align">
-            <img src={wicon} alt="Weather Icon" width="40px" height="40px" />
-            {Math.floor(item.main.temp)}°C
-          </p>
-          <p>
-            {new Date(item.dt * 1000).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-            })}
-          </p>
+      {forecastItems.map((item) => {
+        const iconCode = item.weather[0].icon; // Assuming weather icon code is at item.weather[0].icon
+        const iconUrl = `http://openweathermap.org/img/wn/${iconCode}.png`;
 
-          <p>
-            {new Date(item.dt * 1000).toLocaleDateString("en-US", {
-              weekday: "short",
-            })}
-          </p>
-        </div>
-      ))}
+        return (
+          <div key={item.dt} className="forecast-item">
+            <p className="align">
+              <img
+                src={iconUrl}
+                alt="Weather Icon"
+                width="60px"
+                height="60px"
+              />
+              {Math.floor(item.main.temp)}°C
+            </p>
+            <p>
+              {new Date(item.dt * 1000).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              })}
+            </p>
+            <p>
+              {new Date(item.dt * 1000).toLocaleDateString("en-US", {
+                weekday: "short",
+              })}
+            </p>
+          </div>
+        );
+      })}
     </div>
   );
 };
