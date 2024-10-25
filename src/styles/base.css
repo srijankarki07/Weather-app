@@ -1,0 +1,250 @@
+/*
+ * Base layer: reset, document defaults and the type scale as reusable classes.
+ *
+ * Every size is expressed in `rem` so the layout survives browser text scaling
+ * (PLAN 4.7 prohibits fixed pixel heights for that reason). The one exception is
+ * the type scale itself, which is declared in px to match DESIGN.md exactly and
+ * then consumed through these classes.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Anchors the rem scale; browsers that honour a user font-size still win. */
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--type-body-md-size);
+  font-weight: var(--type-body-md-weight);
+  line-height: var(--type-body-md-leading);
+  color: var(--color-ink);
+  background-color: var(--color-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevents the horizontal jump when a vertical scrollbar appears. */
+  scrollbar-gutter: stable;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+figure {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+a {
+  color: inherit;
+}
+
+hr {
+  height: 1px;
+  border: 0;
+  background-color: var(--color-hairline);
+  margin: 0;
+}
+
+/* ------------------------------------------------------------ Type scale */
+
+.type-display-xl {
+  font-size: var(--type-display-xl-size);
+  font-weight: var(--type-display-xl-weight);
+  line-height: var(--type-display-xl-leading);
+}
+
+.type-display-lg {
+  font-size: var(--type-display-lg-size);
+  font-weight: var(--type-display-lg-weight);
+  line-height: var(--type-display-lg-leading);
+  letter-spacing: var(--type-display-lg-tracking);
+}
+
+.type-display-md {
+  font-size: var(--type-display-md-size);
+  font-weight: var(--type-display-md-weight);
+  line-height: var(--type-display-md-leading);
+}
+
+.type-display-sm {
+  font-size: var(--type-display-sm-size);
+  font-weight: var(--type-display-sm-weight);
+  line-height: var(--type-display-sm-leading);
+  letter-spacing: var(--type-display-sm-tracking);
+}
+
+.type-title-md {
+  font-size: var(--type-title-md-size);
+  font-weight: var(--type-title-md-weight);
+  line-height: var(--type-title-md-leading);
+}
+
+.type-title-sm {
+  font-size: var(--type-title-sm-size);
+  font-weight: var(--type-title-sm-weight);
+  line-height: var(--type-title-sm-leading);
+}
+
+.type-body-md {
+  font-size: var(--type-body-md-size);
+  font-weight: var(--type-body-md-weight);
+  line-height: var(--type-body-md-leading);
+}
+
+.type-body-sm {
+  font-size: var(--type-body-sm-size);
+  font-weight: var(--type-body-sm-weight);
+  line-height: var(--type-body-sm-leading);
+}
+
+.type-caption {
+  font-size: var(--type-caption-size);
+  font-weight: var(--type-caption-weight);
+  line-height: var(--type-caption-leading);
+}
+
+.type-caption-sm {
+  font-size: var(--type-caption-sm-size);
+  font-weight: var(--type-caption-sm-weight);
+  line-height: var(--type-caption-sm-leading);
+}
+
+.type-badge {
+  font-size: var(--type-badge-size);
+  font-weight: var(--type-badge-weight);
+  line-height: var(--type-badge-leading);
+}
+
+.type-micro-label {
+  font-size: var(--type-micro-label-size);
+  font-weight: var(--type-micro-label-weight);
+  line-height: var(--type-micro-label-leading);
+}
+
+/* The loud moment. Reserved for the current temperature. */
+.type-rating-display {
+  font-size: var(--type-rating-display-size);
+  font-weight: var(--type-rating-display-weight);
+  line-height: var(--type-rating-display-leading);
+  letter-spacing: var(--type-rating-display-tracking);
+}
+
+/* --------------------------------------------------------------- Colour */
+
+.text-ink {
+  color: var(--color-ink);
+}
+.text-body {
+  color: var(--color-body);
+}
+.text-muted {
+  color: var(--color-muted);
+}
+.text-primary {
+  color: var(--color-primary);
+}
+
+/* ------------------------------------------------------------ Utilities */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/*
+ * Visible only when focused — used by the skip link so keyboard users can jump
+ * the sticky header instead of tabbing through every control in it.
+ */
+.focus-reveal {
+  position: absolute;
+  top: var(--spacing-sm);
+  left: var(--spacing-sm);
+  z-index: 100;
+  transform: translateY(-200%);
+  transition: transform var(--motion-fast) var(--motion-ease);
+}
+
+.focus-reveal:focus-visible {
+  transform: translateY(0);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+/*
+ * One focus treatment for the whole app. `:focus-visible` keeps it off mouse
+ * clicks while guaranteeing it for keyboard users.
+ */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--rounded-xs);
+}
+
+/*
+ * PLAN 4.7 requires honouring reduced-motion. This is the global kill switch;
+ * individual components also check the query where they animate via JS.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
