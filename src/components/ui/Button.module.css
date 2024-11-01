@@ -1,0 +1,149 @@
+/*
+ * Buttons.
+ *
+ * Transcribed from the `components` block of DESIGN.md. Note the deliberate
+ * absence of hover-state tokens: the source spec documents no hover colours, so
+ * hover is expressed as the one shadow tier plus a background step rather than
+ * an invented hex value.
+ */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  font-family: var(--font-family);
+  font-size: var(--type-body-md-size);
+  font-weight: 500;
+  line-height: 1.25;
+  /* rem, not px, so the target grows with the user's text size (PLAN 4.7). */
+  min-height: 3rem;
+  padding: 14px 24px;
+  border-radius: var(--rounded-sm);
+  border: 1px solid transparent;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-fast) var(--motion-ease);
+  text-align: center;
+  text-decoration: none;
+}
+
+.button:disabled,
+.button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------- primary */
+
+.primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.primary:hover:not(:disabled) {
+  background-color: var(--color-primary-active);
+}
+
+.primary:active:not(:disabled) {
+  background-color: var(--color-primary-active);
+}
+
+.primary:disabled {
+  background-color: var(--color-primary-disabled);
+}
+
+/* ------------------------------------------------------- secondary */
+
+.secondary {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+
+.secondary:hover:not(:disabled) {
+  background-color: var(--color-surface-soft);
+}
+
+.secondary:disabled {
+  color: var(--color-muted-soft);
+  border-color: var(--color-hairline);
+}
+
+/* -------------------------------------------------------- tertiary */
+
+.tertiary {
+  background-color: transparent;
+  color: var(--color-ink);
+  padding: 8px 4px;
+  min-height: 2.75rem;
+}
+
+.tertiary:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+/* ------------------------------------------------------------ pill */
+
+.pill {
+  border-radius: var(--rounded-full);
+  font-size: var(--type-body-sm-size);
+  padding: 10px 20px;
+  min-height: 2.5rem;
+}
+
+/* ---------------------------------------------------- icon buttons */
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rounded-full);
+  border: 1px solid transparent;
+  color: var(--color-ink);
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    box-shadow var(--motion-fast) var(--motion-ease);
+  flex-shrink: 0;
+}
+
+/* 32px in the spec; raised to 44px because below that a touch target fails
+   WCAG 2.5.5 and this is the most-tapped control in the header. */
+.iconCircle {
+  width: 2.75rem;
+  height: 2.75rem;
+  background-color: var(--color-surface-strong);
+}
+
+.iconCircle:hover:not(:disabled) {
+  background-color: var(--color-hairline-soft);
+}
+
+.iconOutline {
+  width: 2.75rem;
+  height: 2.75rem;
+  background-color: var(--color-canvas);
+  border-color: var(--color-hairline);
+}
+
+.iconOutline:hover:not(:disabled) {
+  box-shadow: var(--shadow-float);
+}
+
+/* Labelled variant: icon plus text, used where an icon alone is ambiguous. */
+.iconLabelled {
+  border-radius: var(--rounded-full);
+  gap: var(--spacing-sm);
+  padding: 8px 16px 8px 12px;
+  min-height: 2.75rem;
+  background-color: var(--color-surface-strong);
+  color: var(--color-ink);
+}
+
+.iconLabelled:hover:not(:disabled) {
+  background-color: var(--color-hairline-soft);
+}
+
+.block {
+  width: 100%;
+}
