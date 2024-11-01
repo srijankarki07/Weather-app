@@ -1,0 +1,79 @@
+/*
+ * Skeleton placeholders.
+ *
+ * PLAN 4.6 asks for skeletons that match the final layout rather than a
+ * spinner. Each skeleton is therefore built from the same box model as the
+ * component it stands in for, so nothing shifts when the data lands.
+ */
+
+.skeleton {
+  display: block;
+  background-color: var(--color-surface-strong);
+  border-radius: var(--rounded-sm);
+  position: relative;
+  overflow: hidden;
+}
+
+/*
+ * The sweep is a transformed pseudo-element rather than an animated background
+ * position: transforms stay on the compositor, background-position does not.
+ */
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(255 255 255 / 45%) 50%,
+    transparent 100%
+  );
+  animation: sweep 1.6s var(--motion-ease) infinite;
+}
+
+[data-theme="dark"] .skeleton {
+  background-color: var(--color-surface-strong);
+}
+
+[data-theme="dark"] .skeleton::after {
+  background-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgb(255 255 255 / 8%) 50%,
+    transparent 100%
+  );
+}
+
+@keyframes sweep {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* A pulsing opacity reads as "loading" without any lateral movement. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton::after {
+    animation: none;
+  }
+  .skeleton {
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.text {
+  height: 0.85em;
+  border-radius: var(--rounded-xs);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}

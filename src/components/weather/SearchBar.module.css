@@ -1,0 +1,228 @@
+/*
+ * Sticky header with the global search bar.
+ *
+ * Mirrors the `top-nav` and `search-bar-pill` components in DESIGN.md: an 80px
+ * bar on a canvas fill, hairline underneath, and a fully-rounded search field
+ * terminated by a circular Rausch orb.
+ */
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background-color: var(--wx-glass-bg);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border-bottom: 1px solid var(--color-hairline);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .header {
+    background-color: var(--color-canvas);
+  }
+}
+
+.inner {
+  width: 100%;
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  padding: var(--spacing-md) var(--layout-gutter);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--type-title-md-size);
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+  /* The wordmark is the one place the accent appears in the chrome. */
+}
+
+.wordmarkText {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .wordmarkText {
+    display: inline;
+  }
+}
+
+/* ------------------------------------------------------- search field */
+
+.search {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  height: 3.5rem;
+  padding-left: var(--spacing-lg);
+  padding-right: var(--spacing-xs);
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--rounded-full);
+  transition: box-shadow var(--motion-fast) var(--motion-ease);
+}
+
+.field:focus-within {
+  box-shadow: var(--shadow-float);
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  font-size: var(--type-body-md-size);
+  color: var(--color-ink);
+  /* The rounded field already communicates focus; a second ring on the input
+     itself reads as double-focus. */
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-muted);
+}
+
+/* The circular Rausch orb from DESIGN.md, at the field's right edge. */
+.orb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--rounded-full);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  flex-shrink: 0;
+  transition: background-color var(--motion-fast) var(--motion-ease);
+}
+
+.orb:hover:not(:disabled) {
+  background-color: var(--color-primary-active);
+}
+
+.orb:disabled {
+  background-color: var(--color-primary-disabled);
+  cursor: not-allowed;
+}
+
+/* --------------------------------------------------------- suggestions */
+
+.suggestions {
+  position: absolute;
+  top: calc(100% + var(--spacing-sm));
+  left: 0;
+  right: 0;
+  z-index: 30;
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--rounded-md);
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+  max-height: 20rem;
+  overflow-y: auto;
+}
+
+.suggestion {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-base);
+  text-align: left;
+  color: var(--color-ink);
+  border-bottom: 1px solid var(--color-hairline-soft);
+}
+
+.suggestion:last-child {
+  border-bottom: none;
+}
+
+/* Active (keyboard) and hover states share a fill so the two never disagree. */
+.suggestionActive,
+.suggestion:hover {
+  background-color: var(--color-surface-soft);
+}
+
+.suggestionName {
+  font-size: var(--type-body-md-size);
+  font-weight: 500;
+}
+
+.suggestionMeta {
+  font-size: var(--type-caption-sm-size);
+  color: var(--color-muted);
+}
+
+.suggestionEmpty {
+  padding: var(--spacing-base);
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}
+
+/* ---------------------------------------------------------- utilities */
+
+.locationButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  height: 3.5rem;
+  padding: 0 var(--spacing-base);
+  border-radius: var(--rounded-full);
+  border: 1px solid var(--color-hairline);
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  flex-shrink: 0;
+  transition:
+    box-shadow var(--motion-fast) var(--motion-ease),
+    background-color var(--motion-fast) var(--motion-ease);
+}
+
+.locationButton:hover:not(:disabled) {
+  box-shadow: var(--shadow-float);
+}
+
+.locationButton:disabled {
+  color: var(--color-muted-soft);
+  cursor: not-allowed;
+}
+
+.locationLabel {
+  display: none;
+  font-size: var(--type-body-sm-size);
+  font-weight: 500;
+}
+
+@media (min-width: 720px) {
+  .locationLabel {
+    display: inline;
+  }
+}
+
+.spinner {
+  animation: spin 900ms linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 2.4s;
+  }
+}

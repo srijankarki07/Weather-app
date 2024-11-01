@@ -1,0 +1,103 @@
+/*
+ * Metric tile — the "Today's Highlights" grid unit from PLAN 6.
+ *
+ * Each tile is a small stack: a micro-label, the value at display weight, and an
+ * optional hint line. The accent rail on the left is how severity is carried
+ * when a metric has one (air quality, UV); metrics without severity simply omit
+ * it and the tile stays neutral.
+ */
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-base);
+  border-radius: var(--rounded-md);
+  background-color: var(--color-surface-soft);
+  border: 1px solid transparent;
+  min-width: 0;
+  /* Relative, so the tile grows with the user's text size rather than clipping
+     a long value like "Unhealthy for sensitive groups". */
+  min-height: 6.5rem;
+  justify-content: space-between;
+}
+
+.tile[data-accent="true"] {
+  border-left: 3px solid var(--tile-accent, var(--color-primary));
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.label {
+  font-size: var(--type-micro-label-size);
+  font-weight: var(--type-micro-label-weight);
+  line-height: var(--type-micro-label-leading);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.icon {
+  color: var(--color-muted);
+  flex-shrink: 0;
+}
+
+.reading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xxs);
+  min-width: 0;
+}
+
+.value {
+  font-size: var(--type-display-md-size);
+  font-weight: var(--type-display-md-weight);
+  line-height: 1.15;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+/* Severity-carrying values read better smaller than a pure number. */
+.valueText {
+  font-size: var(--type-title-md-size);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.unit {
+  font-size: var(--type-body-sm-size);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.hint {
+  font-size: var(--type-caption-sm-size);
+  line-height: var(--type-caption-sm-leading);
+  color: var(--color-muted);
+}
+
+/* Trend arrow beside the hint: improving, worsening, or flat. */
+.trend {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  font-weight: 600;
+}
+
+.trendWorse {
+  color: var(--color-error-text);
+}
+
+.trendBetter {
+  color: var(--wx-aqi-good);
+}
+
+.trendFlat {
+  color: var(--color-muted);
+}

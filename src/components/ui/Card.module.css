@@ -1,0 +1,77 @@
+/*
+ * The app's one container surface.
+ *
+ * PLAN 4.6 asks for glassmorphism "with restraint" over dynamic backgrounds.
+ * The restraint here is that glass is translucent but never fully transparent —
+ * the ink stays at full opacity on top of it, so readability does not depend on
+ * whatever gradient happens to be behind the card.
+ */
+
+.card {
+  position: relative;
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--rounded-md);
+  padding: var(--spacing-lg);
+}
+
+.glass {
+  background-color: var(--wx-glass-bg);
+  border-color: var(--wx-glass-border);
+  /*
+   * Backdrop blur is the expensive part of glassmorphism. It is cheap in small
+   * doses and a scroll-killer in large ones, so it is opt-in per card.
+   */
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+
+/* Falls back to an opaque card where backdrop-filter is unsupported. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background-color: var(--color-surface-card);
+  }
+}
+
+.elevated {
+  box-shadow: var(--shadow-float);
+  border-color: transparent;
+}
+
+.padding-none {
+  padding: 0;
+}
+
+.padding-sm {
+  padding: var(--spacing-base);
+}
+
+.padding-lg {
+  padding: var(--spacing-xl);
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-base);
+  margin-bottom: var(--spacing-base);
+}
+
+.title {
+  font-size: var(--type-title-md-size);
+  font-weight: var(--type-title-md-weight);
+  line-height: var(--type-title-md-leading);
+  color: var(--color-ink);
+}
+
+.subtitle {
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-base);
+}
