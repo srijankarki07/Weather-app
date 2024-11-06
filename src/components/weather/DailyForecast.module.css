@@ -1,0 +1,96 @@
+/*
+ * Daily forecast list.
+ *
+ * A row per day: weekday, glyph, a low–high pair, and the precipitation chance.
+ * Phase 2 replaces the bare range with a shared-scale trend bar so days can be
+ * compared against each other; this is the honest simple version that ships
+ * first, per PLAN 8's "each phase should be deployable".
+ */
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 3.25rem 2.5rem 1fr auto;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--color-hairline-soft);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.day {
+  font-size: var(--type-body-sm-size);
+  font-weight: 500;
+  color: var(--color-ink);
+}
+
+/*
+ * Today's row carries the accent so the eye lands on it first. A left rule
+ * rather than a filled row — a tinted row fights the glass card behind it.
+ */
+.today .day {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.icon {
+  color: var(--color-ink);
+}
+
+.description {
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+  /* Long conditions truncate rather than wrap; the row height stays uniform so
+     the list scans as a column. */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.range {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+  font-size: var(--type-body-sm-size);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.high {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.low {
+  color: var(--color-muted);
+}
+
+.pop {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: var(--type-caption-sm-size);
+  color: var(--wx-rain-heavy);
+  min-width: 2.25rem;
+  justify-content: flex-end;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Drop the description column before the numbers when space is tight. */
+@media (max-width: 420px) {
+  .row {
+    grid-template-columns: 3rem 2.25rem 1fr auto;
+    gap: var(--spacing-sm);
+  }
+
+  .description {
+    display: none;
+  }
+}

@@ -1,0 +1,258 @@
+/*
+ * Design tokens.
+ *
+ * Every value below is transcribed from DESIGN.md. The colour, radius, spacing
+ * and type scales keep the source token names so a spec change maps 1:1 onto a
+ * variable rename here. Anything prefixed `--wx-` is an addition this app needs
+ * and DESIGN.md does not cover: weather severity scales, condition gradients and
+ * the dark theme.
+ */
+
+:root {
+  /* ---------------------------------------------------------------- Colour */
+
+  /* Brand & accent — Rausch is the single voltage. Use it sparingly. */
+  --color-primary: #ff385c;
+  --color-primary-active: #e00b41;
+  --color-primary-disabled: #ffd1da;
+  --color-error-text: #c13515;
+  --color-error-text-hover: #b32505;
+  --color-legal-link: #428bff;
+
+  /* Ink — never pure black */
+  --color-ink: #222222;
+  --color-body: #3f3f3f;
+  --color-muted: #6a6a6a;
+  --color-muted-soft: #929292;
+  --color-star-rating: #222222;
+  --color-on-primary: #ffffff;
+  --color-on-dark: #ffffff;
+
+  /* Surfaces */
+  --color-canvas: #ffffff;
+  --color-surface-soft: #f7f7f7;
+  --color-surface-card: #ffffff;
+  --color-surface-strong: #f2f2f2;
+
+  /* Hairlines */
+  --color-hairline: #dddddd;
+  --color-hairline-soft: #ebebeb;
+  --color-border-strong: #c1c1c1;
+
+  --color-scrim: rgb(0 0 0 / 50%);
+
+  /* --------------------------------------------------------------- Radius */
+  --rounded-none: 0px;
+  --rounded-xs: 4px;
+  --rounded-sm: 8px;
+  --rounded-md: 14px;
+  --rounded-lg: 20px;
+  --rounded-xl: 32px;
+  --rounded-full: 9999px;
+
+  /* -------------------------------------------------------------- Spacing */
+  --spacing-xxs: 2px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-base: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+  --spacing-section: 64px;
+
+  /* ----------------------------------------------------------- Typography */
+  /*
+   * DESIGN.md specifies Airbnb Cereal VF, with Circular as the historic
+   * in-house fallback. Neither is licensable here, so Inter — the substitute
+   * the spec itself recommends — sits third, ahead of the system stack.
+   */
+  --font-family: "Airbnb Cereal VF", Circular, Inter, -apple-system, system-ui,
+    Roboto, "Helvetica Neue", sans-serif;
+
+  --type-display-xl-size: 28px;
+  --type-display-xl-weight: 700;
+  --type-display-xl-leading: 1.43;
+
+  --type-display-lg-size: 22px;
+  --type-display-lg-weight: 500;
+  --type-display-lg-leading: 1.18;
+  --type-display-lg-tracking: -0.44px;
+
+  --type-display-md-size: 21px;
+  --type-display-md-weight: 700;
+  --type-display-md-leading: 1.43;
+
+  --type-display-sm-size: 20px;
+  --type-display-sm-weight: 600;
+  --type-display-sm-leading: 1.2;
+  --type-display-sm-tracking: -0.18px;
+
+  --type-title-md-size: 16px;
+  --type-title-md-weight: 600;
+  --type-title-md-leading: 1.25;
+
+  --type-title-sm-size: 16px;
+  --type-title-sm-weight: 500;
+  --type-title-sm-leading: 1.25;
+
+  --type-body-md-size: 16px;
+  --type-body-md-weight: 400;
+  --type-body-md-leading: 1.5;
+
+  --type-body-sm-size: 14px;
+  --type-body-sm-weight: 400;
+  --type-body-sm-leading: 1.43;
+
+  --type-caption-size: 14px;
+  --type-caption-weight: 500;
+  --type-caption-leading: 1.29;
+
+  --type-caption-sm-size: 13px;
+  --type-caption-sm-weight: 400;
+  --type-caption-sm-leading: 1.23;
+
+  --type-badge-size: 11px;
+  --type-badge-weight: 600;
+  --type-badge-leading: 1.18;
+
+  --type-micro-label-size: 12px;
+  --type-micro-label-weight: 700;
+  --type-micro-label-leading: 1.33;
+
+  --type-uppercase-tag-size: 8px;
+  --type-uppercase-tag-weight: 700;
+  --type-uppercase-tag-leading: 1.25;
+  --type-uppercase-tag-tracking: 0.32px;
+
+  /*
+   * The single loud typographic moment in the system. DESIGN.md reserves it for
+   * the listing rating; here it carries the current temperature, which is this
+   * app's equivalent peak signal.
+   */
+  --type-rating-display-size: 64px;
+  --type-rating-display-weight: 700;
+  --type-rating-display-leading: 1.1;
+  --type-rating-display-tracking: -1px;
+
+  /* -------------------------------------------------------- Elevation */
+  /* The system has exactly one shadow tier. */
+  --shadow-float: rgb(0 0 0 / 2%) 0 0 0 1px, rgb(0 0 0 / 4%) 0 2px 6px 0,
+    rgb(0 0 0 / 10%) 0 4px 8px 0;
+
+  /* ------------------------------------------------------------ Motion */
+  --motion-fast: 120ms;
+  --motion-base: 220ms;
+  --motion-slow: 400ms;
+  --motion-ease: cubic-bezier(0.2, 0, 0.2, 1);
+
+  /* ------------------------------------------------------------ Layout */
+  --layout-max-width: 1280px;
+  --layout-gutter: var(--spacing-base);
+  --header-height: 80px;
+
+  /* ======================================================================
+   * Weather extensions — not part of DESIGN.md
+   * ==================================================================== */
+
+  /* Air quality severity. Ordered low risk to high. */
+  --wx-aqi-good: #1f8f4e;
+  --wx-aqi-moderate: #b8860b;
+  --wx-aqi-sensitive: #d2691e;
+  --wx-aqi-unhealthy: #d92d20;
+  --wx-aqi-very-unhealthy: #8b2fa0;
+  --wx-aqi-hazardous: #7a1f2b;
+
+  /* Precip intensity, light to heavy. */
+  --wx-rain-light: #a8d5ff;
+  --wx-rain-moderate: #4a9de0;
+  --wx-rain-heavy: #0b4f9e;
+
+  /* Ultraviolet severity. */
+  --wx-uv-low: #1f8f4e;
+  --wx-uv-moderate: #b8860b;
+  --wx-uv-high: #d2691e;
+  --wx-uv-very-high: #d92d20;
+  --wx-uv-extreme: #8b2fa0;
+
+  /*
+   * Dynamic background. The app shell paints `--wx-gradient` and a glass card
+   * sits on top of it; see `useConditionTheme`.
+   */
+  --wx-gradient: linear-gradient(180deg, #f7f7f7 0%, #ffffff 100%);
+  --wx-gradient-ink: var(--color-ink);
+  --wx-glass-bg: rgb(255 255 255 / 72%);
+  --wx-glass-border: rgb(255 255 255 / 60%);
+}
+
+/*
+ * Dark theme. DESIGN.md documents the public Airbnb web surfaces as light-only,
+ * so this is an addition rather than a transcription: the same token names are
+ * re-pointed at dark values, which keeps every component theme-agnostic. Applied
+ * by `data-theme` on the root element, not by a media query, because the app
+ * also switches on local time of day.
+ */
+[data-theme="dark"] {
+  --color-ink: #f2f2f2;
+  --color-body: #d4d4d4;
+  --color-muted: #a8a8a8;
+  --color-muted-soft: #7d7d7d;
+  --color-star-rating: #f2f2f2;
+
+  --color-canvas: #121212;
+  --color-surface-soft: #1c1c1c;
+  --color-surface-card: #1a1a1a;
+  --color-surface-strong: #262626;
+
+  --color-hairline: #383838;
+  --color-hairline-soft: #2c2c2c;
+  --color-border-strong: #5a5a5a;
+
+  --color-primary-disabled: #6b2534;
+  --color-on-primary: #ffffff;
+
+  --shadow-float: rgb(0 0 0 / 30%) 0 0 0 1px, rgb(0 0 0 / 40%) 0 2px 6px 0,
+    rgb(0 0 0 / 50%) 0 4px 8px 0;
+
+  --wx-rain-light: #4a7ba8;
+  --wx-rain-moderate: #3a7fc0;
+  --wx-rain-heavy: #2b6cb0;
+
+  --wx-glass-bg: rgb(26 26 26 / 72%);
+  --wx-glass-border: rgb(255 255 255 / 10%);
+}
+
+/*
+ * High-contrast mode. PLAN 4.7 asks for WCAG AA at minimum with a manual
+ * toggle, so this raises text/background separation beyond the default palette
+ * rather than relying on the OS preference alone.
+ */
+[data-contrast="high"] {
+  --color-ink: #000000;
+  --color-body: #1a1a1a;
+  --color-muted: #3d3d3d;
+  --color-muted-soft: #4a4a4a;
+  --color-hairline: #767676;
+  --color-hairline-soft: #949494;
+  --color-border-strong: #4a4a4a;
+
+  --wx-glass-bg: rgb(255 255 255 / 96%);
+  --wx-glass-border: #000000;
+
+  --wx-aqi-moderate: #7a5c00;
+  --wx-aqi-sensitive: #9c4a00;
+  --wx-uv-moderate: #7a5c00;
+  --wx-uv-high: #9c4a00;
+}
+
+[data-theme="dark"][data-contrast="high"] {
+  --color-ink: #ffffff;
+  --color-body: #f2f2f2;
+  --color-muted: #d4d4d4;
+  --color-muted-soft: #b8b8b8;
+  --color-hairline: #9a9a9a;
+  --color-hairline-soft: #7d7d7d;
+
+  --wx-glass-bg: rgb(0 0 0 / 88%);
+  --wx-glass-border: #ffffff;
+}
