@@ -1,0 +1,206 @@
+/*
+ * App shell and dynamic backgrounds (PLAN 4.6).
+ *
+ * Gradients are keyed off two data attributes rather than inline styles so the
+ * dark theme can override them — an inline `background` would win over any
+ * stylesheet rule, which is exactly the trap this avoids.
+ *
+ * Six condition families times two day-periods is twelve gradients, and the
+ * restraint is deliberate: DESIGN.md's whole thesis is one accent and a lot of
+ * quiet, so the background shifts mood without becoming the main event.
+ */
+
+.shell {
+  min-height: 100dvh;
+  background-color: var(--color-canvas);
+  background-image: var(--wx-gradient);
+  background-attachment: fixed;
+  color: var(--color-ink);
+  transition: background-image var(--motion-slow) var(--motion-ease);
+}
+
+.container {
+  width: 100%;
+  max-width: var(--layout-max-width);
+  margin: 0 auto;
+  padding: 0 var(--layout-gutter) var(--spacing-section);
+}
+
+/* The scroll layout from PLAN 6: one column, generous but not airy. */
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ------------------------------------------------------- clear */
+
+.shell[data-condition="clear"][data-period="day"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #fff4e0 0%,
+    #e9f3fb 48%,
+    var(--color-canvas) 100%
+  );
+}
+
+.shell[data-condition="clear"][data-period="night"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #131a2b 0%,
+    #1e2942 55%,
+    #2a3653 100%
+  );
+}
+
+/* ------------------------------------------------------ cloudy */
+
+.shell[data-condition="cloudy"][data-period="day"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #eef1f5 0%,
+    #e2e8f0 50%,
+    var(--color-canvas) 100%
+  );
+}
+
+.shell[data-condition="cloudy"][data-period="night"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #16181d 0%,
+    #1f242c 60%,
+    #272d38 100%
+  );
+}
+
+/* -------------------------------------------------------- rain */
+
+.shell[data-condition="rain"][data-period="day"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #dbe7f2 0%,
+    #c5d6e6 55%,
+    #eef2f6 100%
+  );
+}
+
+.shell[data-condition="rain"][data-period="night"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #0d1520 0%,
+    #152233 60%,
+    #1d2e44 100%
+  );
+}
+
+/* ------------------------------------------------------- storm */
+
+.shell[data-condition="storm"][data-period="day"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #ccd4e0 0%,
+    #a9b5c6 55%,
+    #dfe4ea 100%
+  );
+}
+
+.shell[data-condition="storm"][data-period="night"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #0a0d14 0%,
+    #141a26 55%,
+    #1c2434 100%
+  );
+}
+
+/* -------------------------------------------------------- snow */
+
+.shell[data-condition="snow"][data-period="day"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #f4f7fa 0%,
+    #e6eef6 55%,
+    var(--color-canvas) 100%
+  );
+}
+
+.shell[data-condition="snow"][data-period="night"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #151a24 0%,
+    #202836 60%,
+    #2b3547 100%
+  );
+}
+
+/* --------------------------------------------------------- fog */
+
+.shell[data-condition="fog"][data-period="day"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #eceef0 0%,
+    #dfe3e6 55%,
+    var(--color-canvas) 100%
+  );
+}
+
+.shell[data-condition="fog"][data-period="night"] {
+  --wx-gradient: linear-gradient(
+    180deg,
+    #14161a 0%,
+    #1d2126 60%,
+    #272c33 100%
+  );
+}
+
+/*
+ * Dark theme re-points each family one step deeper. Written as a separate block
+ * rather than folded into the rules above because `[data-theme]` lives on
+ * <html>, not on the shell element.
+ */
+[data-theme="dark"] .shell[data-condition="clear"][data-period="day"] {
+  --wx-gradient: linear-gradient(180deg, #2a2113 0%, #171d28 55%, #121212 100%);
+}
+
+[data-theme="dark"] .shell[data-condition="cloudy"][data-period="day"] {
+  --wx-gradient: linear-gradient(180deg, #1c1f24 0%, #191c21 55%, #121212 100%);
+}
+
+[data-theme="dark"] .shell[data-condition="rain"][data-period="day"] {
+  --wx-gradient: linear-gradient(180deg, #131b26 0%, #141a23 55%, #121212 100%);
+}
+
+[data-theme="dark"] .shell[data-condition="storm"][data-period="day"] {
+  --wx-gradient: linear-gradient(180deg, #101319 0%, #13161c 55%, #121212 100%);
+}
+
+[data-theme="dark"] .shell[data-condition="snow"][data-period="day"] {
+  --wx-gradient: linear-gradient(180deg, #1b2028 0%, #181b21 55%, #121212 100%);
+}
+
+[data-theme="dark"] .shell[data-condition="fog"][data-period="day"] {
+  --wx-gradient: linear-gradient(180deg, #191b1e 0%, #17191c 55%, #121212 100%);
+}
+
+/*
+ * High contrast abandons the gradient entirely. A decorative wash behind text
+ * is the first thing that has to go when the goal is a guaranteed 4.5:1.
+ */
+[data-contrast="high"] .shell {
+  background-image: none;
+}
+
+/* Two columns once there is room, mirroring the plan's desktop layout. */
+@media (min-width: 900px) {
+  .stack {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    align-items: start;
+    gap: var(--spacing-lg);
+  }
+
+  /* Cards opt into spanning the full width. */
+  .full {
+    grid-column: 1 / -1;
+  }
+}

@@ -1,0 +1,110 @@
+/*
+ * The hero.
+ *
+ * DESIGN.md reserves its one loud typographic moment — `rating-display`, 64px
+ * at weight 700 — for the single number the user came for. In a listing that is
+ * the review score; here it is the current temperature, which PLAN 6 principle
+ * 1 wants readable from three feet away.
+ */
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-base);
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-base);
+}
+
+.reading {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+}
+
+.temperature {
+  font-size: var(--type-rating-display-size);
+  font-weight: var(--type-rating-display-weight);
+  line-height: var(--type-rating-display-leading);
+  letter-spacing: var(--type-rating-display-tracking);
+  color: var(--color-ink);
+  /* Prevent the glyphs jittering as the value updates during a refetch. */
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-size: var(--type-display-sm-size);
+  font-weight: var(--type-display-sm-weight);
+  color: var(--color-muted);
+}
+
+.icon {
+  flex-shrink: 0;
+}
+
+.description {
+  font-size: var(--type-display-sm-size);
+  font-weight: var(--type-display-sm-weight);
+  line-height: var(--type-display-sm-leading);
+  letter-spacing: var(--type-display-sm-tracking);
+  color: var(--color-ink);
+}
+
+.place {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}
+
+.placeIcon {
+  flex-shrink: 0;
+  color: var(--color-muted);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm) var(--spacing-base);
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}
+
+.factDivider {
+  width: 1px;
+  height: 0.9em;
+  background-color: var(--color-hairline);
+}
+
+/*
+ * The verdict strip. This is the "should I go outside?" answer from PLAN 3's
+ * success metric, and it is the only place besides the search orb that wears
+ * the brand accent — which is what makes it read as the takeaway.
+ */
+.verdict {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-base);
+  border-radius: var(--rounded-sm);
+  background-color: var(--color-surface-soft);
+  border-left: 3px solid var(--color-primary);
+}
+
+.verdictHeadline {
+  font-size: var(--type-body-md-size);
+  font-weight: 600;
+  color: var(--color-ink);
+  flex-shrink: 0;
+}
+
+.verdictDetail {
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}

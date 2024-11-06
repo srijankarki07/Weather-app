@@ -1,0 +1,52 @@
+/*
+ * Weather glyph accents.
+ *
+ * The system's palette is a single accent plus ink, which is right for chrome
+ * but wrong for weather — PLAN 4.6 asks for colour as information, and a
+ * monochrome rain cloud tells the user nothing at a glance. These three accents
+ * are the minimum extra voltage needed: one warm, one cool, one alert.
+ */
+
+.icon {
+  --wx-icon-sun: #f0a02a;
+  --wx-icon-moon: #8a93a8;
+  --wx-icon-precip: var(--color-primary);
+  --wx-icon-bolt: #e8b106;
+
+  display: block;
+  flex-shrink: 0;
+  /* Soft edges match the shape language; nothing in this system has a hard
+     corner, and that applies to the glyphs too. */
+  overflow: visible;
+}
+
+[data-theme="dark"] .icon {
+  --wx-icon-sun: #ffc35c;
+  --wx-icon-moon: #c3cad9;
+  --wx-icon-bolt: #ffd23f;
+}
+
+.mass {
+  fill: currentColor;
+}
+
+.accent {
+  fill: var(--wx-icon-accent, var(--wx-icon-sun));
+}
+
+.stroke {
+  fill: none;
+  stroke: var(--wx-icon-accent, var(--wx-icon-sun));
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.bolt {
+  fill: var(--wx-icon-bolt);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon {
+    animation: none !important;
+  }
+}
