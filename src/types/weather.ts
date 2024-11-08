@@ -95,6 +95,10 @@ export interface HourlyPoint {
   condition: ConditionCode;
   windSpeed: number;
   uvIndex?: number;
+  /** hPa. Carried for the three-hour pressure trend. */
+  pressure?: number;
+  /** Meters; used to render the chart's precipitation bars in mm. */
+  humidity?: number;
 }
 
 export interface DailyPoint {
