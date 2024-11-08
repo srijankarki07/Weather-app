@@ -162,6 +162,8 @@ function buildHourly(raw: OpenMeteoForecastResponse, now: number): HourlyPoint[]
       condition,
       windSpeed: valueAt(hourly.wind_speed_10m, i) ?? 0,
       uvIndex: valueAt(hourly.uv_index, i),
+      pressure: valueAt(hourly.pressure_msl, i),
+      humidity: valueAt(hourly.relative_humidity_2m, i),
     });
   }
 
