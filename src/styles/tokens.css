@@ -168,6 +168,13 @@
   --wx-rain-moderate: #4a9de0;
   --wx-rain-heavy: #0b4f9e;
 
+  /* Temperature curve. Cool-leaning so it never reads as the brand accent. */
+  --wx-chart-temperature: #428bff;
+
+  /* Sun arc. Warm, but muted enough to sit under the primary accent. */
+  --wx-sun-accent: #f0a02a;
+  --wx-sun-accent-soft: #ffd08a;
+
   /* Ultraviolet severity. */
   --wx-uv-low: #1f8f4e;
   --wx-uv-moderate: #b8860b;
@@ -220,6 +227,10 @@
 
   --wx-glass-bg: rgb(26 26 26 / 72%);
   --wx-glass-border: rgb(255 255 255 / 10%);
+
+  --wx-chart-temperature: #6aa9ff;
+  --wx-sun-accent: #ffc35c;
+  --wx-sun-accent-soft: #8a6a34;
 }
 
 /*
