@@ -45,7 +45,21 @@ export function HeroCard({ data, units }: HeroCardProps) {
   )}`;
 
   return (
-    <Card glass elevated padding="lg">
+    /*
+     * `titleId` without `title`: Card labels the section with this heading but
+     * renders no visible header, because the temperature is the hero here and a
+     * "Current conditions" title above it would compete with the thing the user
+     * actually came for.
+     *
+     * The heading itself is the document's h1. Every card below is an h2, so
+     * without this the page had no top-level heading at all and a screen reader
+     * had no entry point into the outline.
+     */
+    <Card glass elevated padding="lg" titleId="current-conditions-heading">
+      <h1 className="visually-hidden" id="current-conditions-heading">
+        {`Current conditions in ${place}`}
+      </h1>
+
       <div className={styles.hero}>
         <div className={styles.top}>
           <div>

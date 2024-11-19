@@ -1,10 +1,11 @@
 /*
- * Daily forecast list.
+ * Daily forecast with trend bars.
  *
- * A row per day: weekday, glyph, a low–high pair, and the precipitation chance.
- * Phase 2 replaces the bare range with a shared-scale trend bar so days can be
- * compared against each other; this is the honest simple version that ships
- * first, per PLAN 8's "each phase should be deployable".
+ * PLAN 4.5 asks for horizontal bars showing each day's high/low range with
+ * today highlighted. The bars share one scale across the whole strip, so a
+ * colder day genuinely looks colder rather than every bar filling its cell —
+ * that comparison is the point of the visualisation, and it is the thing a
+ * per-row scale silently destroys.
  */
 
 .list {
@@ -14,7 +15,7 @@
 
 .row {
   display: grid;
-  grid-template-columns: 3.25rem 2.5rem 1fr auto;
+  grid-template-columns: 3.5rem 2.25rem minmax(4rem, 1fr) auto;
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-sm) 0;
@@ -31,10 +32,7 @@
   color: var(--color-ink);
 }
 
-/*
- * Today's row carries the accent so the eye lands on it first. A left rule
- * rather than a filled row — a tinted row fights the glass card behind it.
- */
+/* Today carries the accent so the eye lands on it first. */
 .today .day {
   color: var(--color-primary);
   font-weight: 700;
@@ -44,15 +42,34 @@
   color: var(--color-ink);
 }
 
-.description {
-  font-size: var(--type-body-sm-size);
-  color: var(--color-muted);
-  /* Long conditions truncate rather than wrap; the row height stays uniform so
-     the list scans as a column. */
+/* ---------------------------------------------------------- trend bar */
+
+.track {
+  position: relative;
+  height: 0.5rem;
+  border-radius: var(--rounded-full);
+  background-color: var(--color-surface-strong);
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
+
+.bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-radius: var(--rounded-full);
+  /* Width and offset come from `rangePosition`, as inline styles. */
+}
+
+/*
+ * Today's bar is outlined as well as tinted, so the highlight does not rely on
+ * colour alone (PLAN 4.7).
+ */
+.todayBar {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+/* ------------------------------------------------------------ readings */
 
 .range {
   display: flex;
@@ -66,10 +83,15 @@
 .high {
   color: var(--color-ink);
   font-weight: 600;
+  /* Fixed width so the bars to their left line up down the column. */
+  min-width: 2.5rem;
+  text-align: right;
 }
 
 .low {
   color: var(--color-muted);
+  min-width: 2.5rem;
+  text-align: right;
 }
 
 .pop {
@@ -83,14 +105,21 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Drop the description column before the numbers when space is tight. */
-@media (max-width: 420px) {
+.iconColumn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* On narrow screens the trend bar is the first thing to go: the numbers still
+   communicate the range, the bar is the comparison aid. */
+@media (max-width: 460px) {
   .row {
-    grid-template-columns: 3rem 2.25rem 1fr auto;
+    grid-template-columns: 3.25rem 2rem auto;
     gap: var(--spacing-sm);
   }
 
-  .description {
+  .track {
     display: none;
   }
 }

@@ -1,0 +1,98 @@
+/*
+ * Sunrise / sunset arc.
+ *
+ * PLAN 6 asks for an arc visualisation rather than two timestamps, because the
+ * useful information is *where the sun is now* — how much daylight is left —
+ * not the two times in isolation.
+ */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.arc {
+  position: relative;
+  width: 100%;
+  /* Roughly a 2:1 aspect, which is what the arc path assumes. */
+  aspect-ratio: 2 / 1.05;
+}
+
+.svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+
+.track {
+  fill: none;
+  stroke: var(--color-hairline);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+/* The elapsed portion of the day, drawn along the same path. */
+.elapsed {
+  fill: none;
+  stroke: var(--wx-sun-accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--motion-slow) var(--motion-ease);
+}
+
+.horizon {
+  stroke: var(--color-hairline);
+  stroke-width: 1;
+}
+
+.sun {
+  fill: var(--wx-sun-accent);
+}
+
+.sunHalo {
+  fill: var(--wx-sun-accent);
+  opacity: 0.22;
+}
+
+/* Night marker: a hollow disc where the sun would be after dark. */
+.moon {
+  fill: var(--color-canvas);
+  stroke: var(--color-muted);
+  stroke-width: 2;
+}
+
+.times {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-base);
+}
+
+.time {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--type-body-md-size);
+  font-weight: 600;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.timeLabel {
+  display: block;
+  font-size: var(--type-caption-sm-size);
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.timeEnd {
+  text-align: right;
+}
+
+.daylight {
+  text-align: center;
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}

@@ -1,26 +1,34 @@
 /**
  * Application root.
  *
- * Phase 1 wires the pieces together: the shell, the search header, and the
- * query-driven content column. Everything below the header is derived from one
- * `useWeather` query, so there is a single loading, error and stale path rather
- * than one per card.
+ * Everything below the header is derived from one `useWeather` call, so there
+ * is a single loading, error and stale path rather than one per card. That
+ * matters for PLAN 4.6's "never show a blank screen": because the fallback to
+ * cached data happens in the hook, every card benefits from it without knowing
+ * it exists.
  */
 
-import { useMemo } from "react";
+import { Suspense, lazy, useEffect, useMemo } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 
 import { AppShell, AppStack, AppStackFull } from "./components/layout/AppShell";
 import { SearchBar } from "./components/weather/SearchBar";
 import { HeroCard } from "./components/weather/HeroCard";
 import { DailyForecast } from "./components/weather/DailyForecast";
-import { WeatherSkeleton } from "./components/weather/WeatherSkeleton";
+import { HighlightsGrid } from "./components/weather/HighlightsGrid";
+import { SunArc } from "./components/weather/SunArc";
+import {
+  WeatherSkeleton,
+  ChartSkeleton,
+} from "./components/weather/WeatherSkeleton";
 import { ErrorState, StaleBanner, Announcer } from "./components/ui/ErrorState";
 import { Button } from "./components/ui/Button";
 
 import { queryClient } from "./lib/queryClient";
+import { pruneExpiredForecasts } from "./lib/db";
 import { useWeather } from "./hooks/useWeather";
 import { useGeolocation } from "./hooks/useGeolocation";
+import { useOnlineStatus } from "./hooks/useOnlineStatus";
 import {
   useActiveLocation,
   useDocumentTitle,
@@ -28,6 +36,17 @@ import {
 import { formatTemperatureShort } from "./lib/units";
 import { formatRelativePast } from "./lib/time";
 import type { UnitSystem } from "./types/weather";
+
+/*
+ * The charting library is the heaviest dependency in the app and the chart sits
+ * below the fold, so it is split into its own chunk. The hero and the daily
+ * forecast — the parts a user reads first — ship in the main bundle.
+ */
+const HourlyChart = lazy(() =>
+  import("./components/weather/HourlyChart").then((module) => ({
+    default: module.HourlyChart,
+  }))
+);
 
 export default function App() {
   return (
@@ -40,13 +59,14 @@ export default function App() {
 function WeatherApp() {
   const { location, setFromSearch, setFromGeolocation } = useActiveLocation();
   const geolocation = useGeolocation();
-  const query = useWeather(location);
+  const online = useOnlineStatus();
+  const weather = useWeather(location);
 
   // Phase 4 turns this into a user preference; the whole tree already takes it
   // as a prop, so the toggle is a one-line change there.
   const units: UnitSystem = "metric";
 
-  const data = query.data;
+  const data = weather.data;
   const condition = data?.current.condition;
   const isNight = data?.current.isNight ?? false;
 
@@ -55,15 +75,10 @@ function WeatherApp() {
     data ? formatTemperatureShort(data.current.temperature, units) : undefined
   );
 
-  /**
-   * Only reached when the fetch failed *and* nothing was cached. If there is
-   * data on screen, the failure is reported with the stale banner instead —
-   * throwing away a readable forecast to show an error page would be a
-   * regression on the old app.
-   */
-  const showFullError = query.isError && !data;
-  const showFirstLoad = query.isPending && !data;
-  const showStale = query.isError && Boolean(data);
+  // Housekeeping once per session, not on every render.
+  useEffect(() => {
+    void pruneExpiredForecasts();
+  }, []);
 
   const announcement = useMemo(() => {
     if (!data) return "";
@@ -97,38 +112,49 @@ function WeatherApp() {
       <Announcer message={announcement} />
 
       <AppStack>
-        {showStale && data && (
+        {/*
+          Shown whenever the data on screen is not live — offline, or a refetch
+          that failed. The timestamp is the whole point: a stale forecast
+          presented as current is worse than no forecast.
+        */}
+        {weather.isStale && data && weather.fetchedAt && (
           <AppStackFull>
             <StaleBanner
-              lastUpdated={formatRelativePast(data.fetchedAt)}
-              offline={typeof navigator !== "undefined" && !navigator.onLine}
-              onRefresh={() => query.refetch()}
-              refreshing={query.isFetching}
+              lastUpdated={formatRelativePast(weather.fetchedAt)}
+              offline={!online}
+              onRefresh={weather.refetch}
+              refreshing={weather.isFetching}
             />
           </AppStackFull>
         )}
 
-        {showFirstLoad && <WeatherSkeleton />}
+        {weather.isFirstLoad && <WeatherSkeleton />}
 
-        {showFullError && (
+        {weather.isUnavailable && (
           <AppStackFull>
             <ErrorState
-              title="Could not load the weather"
-              message={
-                query.error?.message ??
-                "Something went wrong reaching the weather service."
+              title={
+                online
+                  ? "Could not load the weather"
+                  : "You are offline and have no saved forecast"
               }
-              onRetry={() => query.refetch()}
-              /* A dead end otherwise: the geolocation button is the only other
-                 control, and it may be exactly what is blocked. */
+              message={
+                weather.error?.message ??
+                (online
+                  ? "Something went wrong reaching the weather service."
+                  : "Connect to the internet to load a forecast. Once one loads, it will be available offline next time.")
+              }
+              onRetry={online ? weather.refetch : undefined}
             >
-              <Button
-                variant="secondary"
-                onClick={() => geolocation.request()}
-                disabled={geolocation.status === "requesting"}
-              >
-                Use my location
-              </Button>
+              {online && (
+                <Button
+                  variant="secondary"
+                  onClick={handleUseCurrentLocation}
+                  disabled={geolocation.status === "requesting"}
+                >
+                  Use my location
+                </Button>
+              )}
             </ErrorState>
           </AppStackFull>
         )}
@@ -136,11 +162,24 @@ function WeatherApp() {
         {data && (
           <>
             <HeroCard data={data} units={units} />
-            {/* Anchor for the skip link; Phase 2 fills this column out with
-                the hourly chart and the highlights grid. */}
-            <div id="forecast">
-              <DailyForecast data={data} units={units} />
-            </div>
+
+            {/* The chart needs the full width, so it breaks out of the
+                two-column desktop grid. */}
+            <AppStackFull>
+              <div id="forecast">
+                <Suspense fallback={<ChartSkeleton />}>
+                  <HourlyChart data={data} units={units} hours={24} />
+                </Suspense>
+              </div>
+            </AppStackFull>
+
+            <HighlightsGrid data={data} units={units} />
+
+            <DailyForecast data={data} units={units} days={7} />
+
+            <AppStackFull>
+              <SunArc data={data} />
+            </AppStackFull>
           </>
         )}
       </AppStack>
