@@ -48,6 +48,33 @@ export function HeroSkeleton() {
   );
 }
 
+/**
+ * Stands in for the hourly chart while its chunk loads.
+ *
+ * The chart is lazy-loaded because the charting library is by far the heaviest
+ * dependency in the app, and it sits below the fold. PLAN 5 wants a first
+ * contentful paint under 1.5s on 3G and PLAN 8 names lazy-loading as the
+ * mitigation for exactly this kind of bundle weight.
+ */
+export function ChartSkeleton() {
+  return (
+    <Card glass>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--spacing-base)",
+        }}
+        aria-hidden="true"
+      >
+        <Skeleton width="11rem" height="1.1rem" />
+        <Skeleton width="14rem" height="0.8rem" />
+        <Skeleton width="100%" height="13.75rem" radius="md" />
+      </div>
+    </Card>
+  );
+}
+
 export function MetricGridSkeleton({ count = 6 }: { count?: number }) {
   return (
     <Card glass>

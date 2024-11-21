@@ -1,0 +1,99 @@
+/*
+ * Hourly temperature and precipitation chart.
+ *
+ * PLAN 4.5 calls for the temperature curve and the precipitation bars to share
+ * a timeline — that overlay is the whole point, since "18° and raining" is a
+ * different afternoon from "18° and clear".
+ *
+ * The chart scrolls horizontally rather than compressing. Cramming 24 hours of
+ * labels into a phone width produces a smear of overlapping text; letting the
+ * card scroll keeps every label readable and the touch target honest.
+ */
+
+.scroller {
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* Room for the focus ring on the chart's own focusable elements. */
+  padding-bottom: var(--spacing-xs);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.scroller:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--rounded-sm);
+}
+
+.canvas {
+  /* Set from the component: hours x px-per-hour. */
+  position: relative;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-base);
+  margin-top: var(--spacing-md);
+  font-size: var(--type-caption-sm-size);
+  color: var(--color-muted);
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.swatchLine {
+  width: 1rem;
+  height: 3px;
+  border-radius: var(--rounded-full);
+  background-color: var(--wx-chart-temperature);
+}
+
+.swatchBar {
+  width: 0.6rem;
+  height: 0.75rem;
+  border-radius: 2px;
+  background-color: var(--wx-rain-moderate);
+}
+
+/* Custom tooltip, styled as a small card rather than Recharts' default box. */
+.tooltip {
+  background-color: var(--color-canvas);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--rounded-sm);
+  box-shadow: var(--shadow-float);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--type-body-sm-size);
+  color: var(--color-ink);
+  min-width: 8.5rem;
+}
+
+.tooltipTime {
+  font-weight: 600;
+  margin-bottom: var(--spacing-xxs);
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-base);
+  color: var(--color-muted);
+}
+
+.tooltipValue {
+  color: var(--color-ink);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.empty {
+  padding: var(--spacing-xl) 0;
+  text-align: center;
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}

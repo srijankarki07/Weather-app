@@ -82,6 +82,59 @@
   color: var(--color-muted);
 }
 
+/* ------------------------------------------------ activity verdicts */
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--spacing-base);
+  border-top: 1px solid var(--color-hairline-soft);
+}
+
+.activityRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-base);
+  padding: var(--spacing-sm) 0;
+  border-bottom: 1px solid var(--color-hairline-soft);
+}
+
+.activityRow:last-child {
+  border-bottom: none;
+}
+
+.activityName {
+  font-size: var(--type-body-sm-size);
+  color: var(--color-ink);
+}
+
+/*
+ * Verdict pills. Colour alone does not carry the meaning — the label says
+ * "Best avoided" as well — so the tint is reinforcement rather than the only
+ * signal (PLAN 4.7).
+ */
+.activityVerdict {
+  font-size: var(--type-caption-sm-size);
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--rounded-full);
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+
+.activityVerdict[data-verdict="good"] {
+  color: var(--wx-aqi-good);
+}
+
+.activityVerdict[data-verdict="caution"] {
+  color: var(--wx-aqi-moderate);
+}
+
+.activityVerdict[data-verdict="avoid"] {
+  color: var(--color-error-text);
+}
+
 /* Trend arrow beside the hint: improving, worsening, or flat. */
 .trend {
   display: inline-flex;
