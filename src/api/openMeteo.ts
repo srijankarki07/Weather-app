@@ -48,6 +48,7 @@ export interface OpenMeteoHourly {
   wind_speed_10m?: (number | null)[];
   uv_index?: (number | null)[];
   visibility?: (number | null)[];
+  pressure_msl?: (number | null)[];
 }
 
 export interface OpenMeteoDaily {
@@ -150,6 +151,7 @@ export async function fetchForecast(
       "wind_speed_10m",
       "uv_index",
       "visibility",
+      "pressure_msl",
     ].join(","),
     daily: [
       "weather_code",

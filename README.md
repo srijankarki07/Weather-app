@@ -23,6 +23,34 @@ npm test          # unit and integration tests
 npm run build     # production bundle into build/
 ```
 
+## What it does
+
+- **Current conditions** with a one-line verdict — "Good to be outside", "Take
+  an umbrella" — so the answer precedes the data.
+- **Hourly chart** overlaying the temperature curve with precipitation
+  probability, with the high and low annotated on the curve.
+- **7-day forecast** where each day's range is drawn as a bar on a *shared*
+  scale, so colder days genuinely look colder instead of every bar filling its
+  row.
+- **Highlights** that interpret rather than report: dew point as a comfort word,
+  UV as a burn time, air quality as health guidance, pressure as a trend.
+- **Per-activity advice** for running and cycling.
+- **Sun arc** showing how much daylight is left, not just when it started.
+- **Offline.** The last successful forecast is cached in IndexedDB and served
+  with a timestamp when the network is gone — see [Offline](#offline).
+
+## Offline
+
+Every successful fetch is written to IndexedDB and the app reads it back on the
+next load, so a cold start with no connection shows the last forecast rather
+than a spinner. The hook that does this is
+[`useWeather`](./src/hooks/useWeather.ts): two queries per location, one against
+the network and one against the cache, with the network always winning.
+
+Cached data older than twelve hours is treated as absent. A two-day-old forecast
+presented as current is worse than admitting there is nothing to show, so past
+that point the app says so instead.
+
 ## Data sources
 
 Every provider used here is **free and keyless**. The app ships no API key, so
@@ -50,18 +78,20 @@ src/
 │   ├── http.ts        fetch wrapper: timeouts, error normalisation
 │   ├── openMeteo.ts   forecast and air quality
 │   ├── geocoding.ts   place search and reverse lookup
+│   ├── normalize.ts   provider codes → the internal vocabulary
 │   └── weather.ts     merges providers → one WeatherData
-├── hooks/        TanStack Query hooks, geolocation, active location
-├── lib/          Units, time-in-zone, condition mapping, query client
+├── hooks/        TanStack Query hooks, geolocation, online status, charts
+├── lib/          Units, time-in-zone, comfort indices, palette, IndexedDB
 ├── components/
 │   ├── ui/            Card, Button, Skeleton, ErrorState, icons
 │   ├── weather/       Cards specific to weather
 │   └── layout/        App shell and dynamic background
 ├── styles/       Design tokens and base layer
+├── test/         Shared fixtures and the fetch mock
 └── types/        The internal weather model
 ```
 
-Three rules hold the structure together:
+Four rules hold the structure together:
 
 1. **Providers are never called from components.** Only `api/` talks to the
    network, and everything it returns is normalised into the `WeatherData` type
@@ -72,6 +102,18 @@ Three rules hold the structure together:
 3. **Times render in the location's zone, not the browser's.** Searching for
    Tokyo from London shows Tokyo's clock, via the IANA zone the provider
    returns.
+4. **Interpretation lives in `lib/`, not in components.** Thresholds for comfort,
+   UV severity, pressure trend and activity advice are in
+   [`comfort.ts`](./src/lib/comfort.ts) so they can be reviewed — and tested —
+   in one place rather than being scattered through JSX.
+
+### Bundle splitting
+
+The charting library is the heaviest dependency in the project, so the hourly
+chart is lazy-loaded into its own chunk and the main bundle stays around 106 kB
+gzipped instead of 202 kB. The hero and the daily forecast, which a user reads
+first, ship in the main bundle. PLAN §5 targets a first contentful paint under
+1.5s on 3G, and PLAN §8 names lazy-loading as the mitigation for bundle weight.
 
 ## Design system
 

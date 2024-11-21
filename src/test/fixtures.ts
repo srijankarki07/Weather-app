@@ -29,6 +29,12 @@ export interface ForecastFixtureOptions {
   /** Overrides the current temperature, in celsius. */
   temperature?: number;
   weatherCode?: number;
+  /**
+   * Pins the UV index across the whole hourly series. The default ramp puts a
+   * low value at the current hour, which is right for a realistic fixture but
+   * does not exercise the burn-time branch.
+   */
+  uvIndex?: number;
 }
 
 /**
@@ -42,6 +48,7 @@ export function buildForecastFixture(
     minutelyPoints = 96,
     temperature = 24.3,
     weatherCode = 3,
+    uvIndex,
   } = options;
 
   const base = todayMidnightSeconds();
@@ -89,7 +96,9 @@ export function buildForecastFixture(
       precipitation: hourlyTimes.map(() => 0.2),
       weather_code: hourlyTimes.map(() => weatherCode),
       wind_speed_10m: hourlyTimes.map(() => 3),
-      uv_index: hourlyTimes.map((_, i) => Math.min(10, i % 12)),
+      uv_index: hourlyTimes.map((_, i) =>
+        uvIndex ?? Math.min(10, i % 12)
+      ),
       visibility: hourlyTimes.map(() => 12_000),
     },
     daily: {
