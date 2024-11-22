@@ -16,6 +16,24 @@ export const OPEN_METEO_GEOCODE_BASE = "https://geocoding-api.open-meteo.com/v1"
 export const BIGDATACLOUD_REVERSE_BASE =
   "https://api.bigdatacloud.net/data/reverse-geocode-client";
 
+/** RainViewer serves free radar and infrared tiles; used from Phase 3 onward. */
+export const RAINVIEWER_MANIFEST =
+  "https://api.rainviewer.com/public/weather-maps.json";
+
+/**
+ * Optional. OpenWeather's free tier includes `temp_new` tile layers, which is
+ * the only keyless-or-free source of a temperature overlay for Leaflet — every
+ * other provider wants either a paid plan or a Mapbox/MapTiler account.
+ *
+ * When this is absent the radar map simply offers the two RainViewer layers,
+ * which is why the temperature layer is the only thing in the app that reads
+ * this value. Set `REACT_APP_OPENWEATHER_API_KEY` to enable it.
+ */
+export const OPENWEATHER_TILE_KEY =
+  process.env.REACT_APP_OPENWEATHER_API_KEY ?? "";
+
+export const hasTemperatureTiles = OPENWEATHER_TILE_KEY.length > 0;
+
 /**
  * TanStack Query stale times. PLAN 5.2: "Cache aggressively but invalidate
  * intelligently." Keeping them in one table makes the policy reviewable.
