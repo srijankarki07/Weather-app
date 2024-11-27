@@ -252,3 +252,62 @@ export async function fetchAirQuality(
       : {}),
   };
 }
+
+/* -------------------------------------------------------------------------
+ * Summary
+ * ---------------------------------------------------------------------- */
+
+/**
+ * The minimum needed to draw a city card: temperature, condition and the day's
+ * range. The multi-city dashboard shows one card per saved location, so
+ * fetching the full bundle for each would multiply a large payload by the
+ * number of cities for data that is then thrown away.
+ */
+export interface OpenMeteoSummaryResponse {
+  utc_offset_seconds: number;
+  timezone: string;
+  current: {
+    time: number;
+    temperature_2m: number | null;
+    apparent_temperature: number | null;
+    weather_code: number | null;
+    is_day: number | null;
+  };
+  daily: {
+    time: number[];
+    temperature_2m_max: (number | null)[];
+    temperature_2m_min: (number | null)[];
+  };
+}
+
+export async function fetchSummary(
+  lat: number,
+  lon: number,
+  { signal }: { signal?: AbortSignal } = {}
+): Promise<OpenMeteoSummaryResponse> {
+  const query = buildQuery({
+    latitude: lat,
+    longitude: lon,
+    current: [
+      "temperature_2m",
+      "apparent_temperature",
+      "weather_code",
+      "is_day",
+    ].join(","),
+    daily: ["temperature_2m_max", "temperature_2m_min"].join(","),
+    timezone: "auto",
+    timeformat: "unixtime",
+    forecast_days: 1,
+  });
+
+  const raw = await getJson<OpenMeteoSummaryResponse>(
+    `${OPEN_METEO_BASE}/forecast?${query}`,
+    { signal, timeoutMs: 8000 }
+  );
+
+  return {
+    ...raw,
+    current: { ...raw.current, time: toMs(raw.current.time) },
+    daily: { ...raw.daily, time: raw.daily.time.map(toMs) },
+  };
+}
