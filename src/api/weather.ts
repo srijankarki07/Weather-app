@@ -13,6 +13,7 @@
 
 import type {
   AirQuality,
+  ConditionCode,
   Coordinates,
   CurrentConditions,
   DailyPoint,
@@ -36,6 +37,7 @@ import { reverseGeocode } from "./geocoding";
 import {
   fetchAirQuality,
   fetchForecast,
+  fetchSummary,
   type OpenMeteoAirQualityResponse,
   type OpenMeteoForecastResponse,
 } from "./openMeteo";
@@ -394,4 +396,47 @@ async function resolveLabel(
     };
   }
   return { name: "Current location" };
+}
+
+/* -------------------------------------------------------------------------
+ * Lightweight summary
+ * ---------------------------------------------------------------------- */
+
+/** Just enough to render a saved-location card. */
+export interface LocationSummary {
+  temperature: number;
+  feelsLike: number;
+  condition: ConditionCode;
+  isNight: boolean;
+  high: number;
+  low: number;
+  observedAt: number;
+}
+
+export async function fetchLocationSummary(options: {
+  lat: number;
+  lon: number;
+  signal?: AbortSignal;
+}): Promise<LocationSummary> {
+  const { lat, lon, signal } = options;
+  const raw = await fetchSummary(lat, lon, { signal });
+
+  const temperature = raw.current.temperature_2m;
+  if (typeof temperature !== "number") {
+    throw new Error("The weather service returned no temperature reading.");
+  }
+
+  const condition = wmoToCondition(raw.current.weather_code);
+  const high = valueAt(raw.daily.temperature_2m_max, 0);
+  const low = valueAt(raw.daily.temperature_2m_min, 0);
+
+  return {
+    temperature,
+    feelsLike: raw.current.apparent_temperature ?? temperature,
+    condition,
+    isNight: raw.current.is_day === 0,
+    high: high ?? temperature,
+    low: low ?? temperature,
+    observedAt: raw.current.time,
+  };
 }
