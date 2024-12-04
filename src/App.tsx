@@ -4,23 +4,23 @@
  * Everything below the header is derived from one `useWeather` call, so there
  * is a single loading, error and stale path rather than one per card. That
  * matters for PLAN 4.6's "never show a blank screen": because the fallback to
- * cached data happens in the hook, every card benefits from it without knowing
- * it exists.
+ * cached data happens in the hook, every card benefits without knowing it
+ * exists.
  */
 
-import { Suspense, lazy, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 
 import { AppShell, AppStack, AppStackFull } from "./components/layout/AppShell";
 import { SearchBar } from "./components/weather/SearchBar";
 import { HeroCard } from "./components/weather/HeroCard";
+import { NowcastBanner } from "./components/weather/NowcastBanner";
+import { ForecastTabs } from "./components/weather/ForecastTabs";
 import { DailyForecast } from "./components/weather/DailyForecast";
 import { HighlightsGrid } from "./components/weather/HighlightsGrid";
 import { SunArc } from "./components/weather/SunArc";
-import {
-  WeatherSkeleton,
-  ChartSkeleton,
-} from "./components/weather/WeatherSkeleton";
+import { CityStrip, savedLocationId } from "./components/weather/CityStrip";
+import { WeatherSkeleton } from "./components/weather/WeatherSkeleton";
 import { ErrorState, StaleBanner, Announcer } from "./components/ui/ErrorState";
 import { Button } from "./components/ui/Button";
 
@@ -29,24 +29,12 @@ import { pruneExpiredForecasts } from "./lib/db";
 import { useWeather } from "./hooks/useWeather";
 import { useGeolocation } from "./hooks/useGeolocation";
 import { useOnlineStatus } from "./hooks/useOnlineStatus";
-import {
-  useActiveLocation,
-  useDocumentTitle,
-} from "./hooks/useActiveLocation";
+import { useSavedLocations } from "./hooks/useSavedLocations";
+import { useDocumentTitle } from "./hooks/useDocumentTitle";
+import { useAppStore } from "./store/useAppStore";
 import { formatTemperatureShort } from "./lib/units";
 import { formatRelativePast } from "./lib/time";
 import type { UnitSystem } from "./types/weather";
-
-/*
- * The charting library is the heaviest dependency in the app and the chart sits
- * below the fold, so it is split into its own chunk. The hero and the daily
- * forecast — the parts a user reads first — ship in the main bundle.
- */
-const HourlyChart = lazy(() =>
-  import("./components/weather/HourlyChart").then((module) => ({
-    default: module.HourlyChart,
-  }))
-);
 
 export default function App() {
   return (
@@ -57,25 +45,31 @@ export default function App() {
 }
 
 function WeatherApp() {
-  const { location, setFromSearch, setFromGeolocation } = useActiveLocation();
+  const activeLocation = useAppStore((state) => state.activeLocation);
+  const setFromSearch = useAppStore((state) => state.setFromSearch);
+  const setFromGeolocation = useAppStore((state) => state.setFromGeolocation);
+  const setFromSaved = useAppStore((state) => state.setFromSaved);
+  const recordSearch = useAppStore((state) => state.recordSearch);
+  const recentSearches = useAppStore((state) => state.recentSearches);
+  const clearRecentSearches = useAppStore((state) => state.clearRecentSearches);
+
   const geolocation = useGeolocation();
   const online = useOnlineStatus();
-  const weather = useWeather(location);
+  const weather = useWeather(activeLocation);
+  const saved = useSavedLocations();
 
-  // Phase 4 turns this into a user preference; the whole tree already takes it
-  // as a prop, so the toggle is a one-line change there.
   const units: UnitSystem = "metric";
 
   const data = weather.data;
   const condition = data?.current.condition;
   const isNight = data?.current.isNight ?? false;
+  const placeName = data?.location.name ?? activeLocation.name;
 
   useDocumentTitle(
-    data?.location.name ?? location.name,
+    placeName,
     data ? formatTemperatureShort(data.current.temperature, units) : undefined
   );
 
-  // Housekeeping once per session, not on every render.
   useEffect(() => {
     void pruneExpiredForecasts();
   }, []);
@@ -87,9 +81,38 @@ function WeatherApp() {
     )} degrees, ${data.current.description.toLowerCase()}.`;
   }, [data]);
 
+  const handleSelect = useCallback(
+    (
+      coords: { lat: number; lon: number },
+      name: string,
+      extra?: { region?: string; country?: string }
+    ) => {
+      setFromSearch(coords, name, extra);
+      // PLAN 4.4's recent searches: recorded on selection, not on keystroke,
+      // so a half-typed query never lands in the history.
+      recordSearch({ coords, name, region: extra?.region, country: extra?.country });
+    },
+    [setFromSearch, recordSearch]
+  );
+
   const handleUseCurrentLocation = async () => {
     const coords = await geolocation.request();
     if (coords) setFromGeolocation(coords);
+  };
+
+  const activeId = savedLocationId(
+    activeLocation.coords.lat,
+    activeLocation.coords.lon
+  );
+  const isCurrentSaved = saved.locations.some((row) => row.id === activeId);
+
+  const handleSaveCurrent = async () => {
+    await saved.addLocation({
+      name: activeLocation.name,
+      region: activeLocation.region,
+      country: activeLocation.country,
+      coords: activeLocation.coords,
+    });
   };
 
   return (
@@ -98,9 +121,11 @@ function WeatherApp() {
       isNight={isNight}
       header={
         <SearchBar
-          onSelect={setFromSearch}
+          onSelect={handleSelect}
           onUseCurrentLocation={handleUseCurrentLocation}
           geolocationStatus={geolocation.status}
+          recentSearches={recentSearches}
+          onClearRecent={clearRecentSearches}
         />
       }
     >
@@ -113,9 +138,9 @@ function WeatherApp() {
 
       <AppStack>
         {/*
-          Shown whenever the data on screen is not live — offline, or a refetch
-          that failed. The timestamp is the whole point: a stale forecast
-          presented as current is worse than no forecast.
+          Shown whenever the data on screen is not live. The timestamp is the
+          whole point: a stale forecast presented as current is worse than no
+          forecast at all.
         */}
         {weather.isStale && data && weather.fetchedAt && (
           <AppStackFull>
@@ -163,13 +188,14 @@ function WeatherApp() {
           <>
             <HeroCard data={data} units={units} />
 
-            {/* The chart needs the full width, so it breaks out of the
-                two-column desktop grid. */}
+            <AppStackFull>
+              <NowcastBanner data={data} />
+            </AppStackFull>
+
+            {/* The chart and the map both need the full width on desktop. */}
             <AppStackFull>
               <div id="forecast">
-                <Suspense fallback={<ChartSkeleton />}>
-                  <HourlyChart data={data} units={units} hours={24} />
-                </Suspense>
+                <ForecastTabs data={data} units={units} />
               </div>
             </AppStackFull>
 
@@ -179,6 +205,18 @@ function WeatherApp() {
 
             <AppStackFull>
               <SunArc data={data} />
+            </AppStackFull>
+
+            <AppStackFull>
+              <CityStrip
+                locations={saved.locations}
+                units={units}
+                activeId={isCurrentSaved ? activeId : undefined}
+                onSelect={setFromSaved}
+                onRemove={(id) => void saved.removeLocation(id)}
+                onSaveCurrent={isCurrentSaved ? undefined : handleSaveCurrent}
+                currentName={placeName}
+              />
             </AppStackFull>
           </>
         )}

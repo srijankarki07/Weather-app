@@ -35,6 +35,8 @@ export interface ForecastFixtureOptions {
    * does not exercise the burn-time branch.
    */
   uvIndex?: number;
+  /** Millimetres per 15-minute step across the nowcast window. */
+  nowcastMm?: number;
 }
 
 /**
@@ -49,6 +51,7 @@ export function buildForecastFixture(
     temperature = 24.3,
     weatherCode = 3,
     uvIndex,
+    nowcastMm = 0.3,
   } = options;
 
   const base = todayMidnightSeconds();
@@ -115,7 +118,7 @@ export function buildForecastFixture(
     },
     minutely_15: {
       time: minutelyTimes,
-      precipitation: minutelyTimes.map(() => 0.3),
+      precipitation: minutelyTimes.map(() => nowcastMm),
       precipitation_probability: minutelyTimes.map(() => 40),
     },
   };

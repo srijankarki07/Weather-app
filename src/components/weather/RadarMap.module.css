@@ -1,0 +1,201 @@
+/*
+ * Radar map.
+ *
+ * Leaflet's own stylesheet is loaded by the component. Everything below is the
+ * chrome around the map: the layer switcher, the time scrubber, and the
+ * attribution strip.
+ */
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.mapFrame {
+  position: relative;
+  width: 100%;
+  /* Relative height so the map grows with the user's text size rather than
+     fixing a pixel box (PLAN 4.7). */
+  height: 22rem;
+  border-radius: var(--rounded-md);
+  overflow: hidden;
+  background-color: var(--color-surface-strong);
+  /* Leaflet's panes create their own stacking contexts; keeping them under the
+     sticky header avoids the map painting over it while scrolled. */
+  z-index: 0;
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+/* Leaflet hard-codes a white control background, which is wrong in dark mode. */
+.map :global(.leaflet-control-attribution) {
+  background-color: var(--color-canvas);
+  color: var(--color-muted);
+  font-size: 10px;
+}
+
+.map :global(.leaflet-control-attribution a) {
+  color: var(--color-muted);
+}
+
+.map :global(.leaflet-bar a) {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  border-color: var(--color-hairline);
+}
+
+.map :global(.leaflet-bar a:hover) {
+  background-color: var(--color-surface-soft);
+}
+
+/* ------------------------------------------------------- layer switcher */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.tabs {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: var(--rounded-full);
+  background-color: var(--color-surface-strong);
+  gap: 2px;
+}
+
+.tab {
+  padding: 6px 14px;
+  border-radius: var(--rounded-full);
+  font-size: var(--type-body-sm-size);
+  font-weight: 500;
+  color: var(--color-muted);
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    color var(--motion-fast) var(--motion-ease);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  color: var(--color-ink);
+}
+
+.tabActive {
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-float);
+}
+
+/* --------------------------------------------------------- time scrubber */
+
+.scrubber {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.scrubberHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-base);
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}
+
+.scrubberTime {
+  font-weight: 600;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.range {
+  width: 100%;
+  /* 44px tall hit area on a visually thin track — the control needs to be
+     draggable on a phone without a visible slab of grey. */
+  height: 2.75rem;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--rounded-full);
+  background-color: var(--color-hairline);
+}
+
+.range::-moz-range-track {
+  height: 6px;
+  border-radius: var(--rounded-full);
+  background-color: var(--color-hairline);
+}
+
+.range::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -7px;
+  border-radius: var(--rounded-full);
+  background-color: var(--color-primary);
+  border: 2px solid var(--color-canvas);
+  box-shadow: var(--shadow-float);
+}
+
+.range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--rounded-full);
+  background-color: var(--color-primary);
+  border: 2px solid var(--color-canvas);
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--type-caption-sm-size);
+  color: var(--color-muted);
+}
+
+.legendGradient {
+  flex: 1 1 auto;
+  height: 8px;
+  border-radius: var(--rounded-full);
+  max-width: 12rem;
+  /* Matches RainViewer's Universal Blue scheme, which is what the tiles use. */
+  background-image: linear-gradient(
+    90deg,
+    #9ec9f5 0%,
+    #4a9de0 35%,
+    #1f6fb2 60%,
+    #b8860b 80%,
+    #d92d20 100%
+  );
+}
+
+.note {
+  font-size: var(--type-caption-sm-size);
+  color: var(--color-muted);
+}
+
+.loading,
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 22rem;
+  border-radius: var(--rounded-md);
+  background-color: var(--color-surface-soft);
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+  text-align: center;
+  padding: var(--spacing-base);
+}
