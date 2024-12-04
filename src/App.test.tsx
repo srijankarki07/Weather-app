@@ -21,6 +21,7 @@ import App from "./App";
 import { queryClient } from "./lib/queryClient";
 import { db, readCachedForecast } from "./lib/db";
 import { DEFAULT_LOCATION } from "./config";
+import { useAppStore, FALLBACK_LOCATION } from "./store/useAppStore";
 import {
   buildForecastFixture,
   mockWeatherFetch,
@@ -36,6 +37,15 @@ beforeEach(async () => {
   // the next test's offline path before it ever went offline.
   await db.forecasts.clear();
   await db.locations.clear();
+  /*
+   * The Zustand store is module state, so clearing localStorage does not reset
+   * it. Without this, a city chosen by one test leaks into the next and the
+   * offline test reads the cache for the wrong coordinates.
+   */
+  useAppStore.setState({
+    activeLocation: FALLBACK_LOCATION,
+    recentSearches: [],
+  });
 
   /*
    * Retries are right in production but wrong here: the default policy backs
@@ -218,6 +228,131 @@ describe("highlights", () => {
     );
     expect(highlights.getByText("Running")).toBeInTheDocument();
     expect(highlights.getByText("Cycling")).toBeInTheDocument();
+  });
+});
+
+describe("nowcast banner", () => {
+  it("announces rain when it is falling", async () => {
+    mockWeatherFetch();
+    render(<App />);
+
+    const banner = await screen.findByRole("region", {
+      name: /precipitation nowcast/i,
+    });
+    expect(banner).toHaveTextContent(/rain for the next hour/i);
+  });
+
+  it("announces rain that is on its way", async () => {
+    /*
+     * A hand-built series rather than the fixture: rain has to start partway
+     * through the hour, and the fixture's minutely block is uniform.
+     */
+    const forecast = buildForecastFixture({ nowcastMm: 0 });
+    const start = Math.floor(Date.now() / 1000) - 15 * 60;
+    const times = Array.from({ length: 8 }, (_, i) => start + i * 15 * 60);
+    forecast.minutely_15 = {
+      time: times,
+      // Dry for the first two steps, then raining.
+      precipitation: times.map((_, i) => (i < 2 ? 0 : 1.4)),
+      precipitation_probability: times.map(() => 80),
+    };
+    mockWeatherFetch({ forecast });
+
+    render(<App />);
+
+    const banner = await screen.findByRole("region", {
+      name: /precipitation nowcast/i,
+    });
+    expect(banner).toHaveTextContent(/rain starting in about/i);
+  });
+
+  it("stays out of the way when the hour is dry", async () => {
+    mockWeatherFetch({ forecast: buildForecastFixture({ nowcastMm: 0 }) });
+
+    render(<App />);
+    // Wait for the page to settle before asserting an absence.
+    await waitFor(() => expect(hero().getByText("24")).toBeInTheDocument());
+
+    expect(
+      screen.queryByRole("region", { name: /precipitation nowcast/i })
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("saved locations", () => {
+  it("saves the current city and shows it in the dashboard", async () => {
+    mockWeatherFetch();
+    const user = userEvent.setup();
+
+    render(<App />);
+    await waitFor(() => expect(hero().getByText("24")).toBeInTheDocument());
+
+    await user.click(
+      screen.getByRole("button", { name: /save kathmandu/i })
+    );
+
+    // The strip reloads from IndexedDB via `useLiveQuery`, so this also proves
+    // the write actually landed rather than only updating local state.
+    const strip = await screen.findByRole("group", {
+      name: /saved locations/i,
+    });
+    await waitFor(() =>
+      expect(within(strip).getByText("Kathmandu")).toBeInTheDocument()
+    );
+
+    // Once saved, the save action is replaced by the remove control.
+    expect(
+      within(strip).getByRole("button", { name: /remove kathmandu/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /save kathmandu/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it("removes a saved city", async () => {
+    mockWeatherFetch();
+    const user = userEvent.setup();
+
+    render(<App />);
+    await waitFor(() => expect(hero().getByText("24")).toBeInTheDocument());
+
+    await user.click(screen.getByRole("button", { name: /save kathmandu/i }));
+    const strip = await screen.findByRole("group", {
+      name: /saved locations/i,
+    });
+
+    await user.click(
+      await within(strip).findByRole("button", { name: /remove kathmandu/i })
+    );
+
+    await waitFor(() =>
+      expect(
+        screen.queryByRole("button", { name: /remove kathmandu/i })
+      ).not.toBeInTheDocument()
+    );
+  });
+});
+
+describe("recent searches", () => {
+  it("offers previously searched cities when the field is empty", async () => {
+    mockWeatherFetch();
+    const user = userEvent.setup();
+
+    render(<App />);
+    await waitFor(() => expect(hero().getByText("24")).toBeInTheDocument());
+
+    const input = screen.getByRole("combobox", { name: /search for a city/i });
+    await user.click(input);
+    await user.type(input, "Kathmandu");
+    await user.click(await screen.findByRole("option", { name: /Kathmandu/i }));
+
+    // Selecting clears the field, so focusing it again should show history.
+    await user.click(input);
+
+    const listbox = await screen.findByRole("listbox", {
+      name: /recent searches/i,
+    });
+    expect(within(listbox).getByText("Kathmandu")).toBeInTheDocument();
   });
 });
 
