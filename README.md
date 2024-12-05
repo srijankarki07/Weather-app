@@ -36,6 +36,14 @@ npm run build     # production bundle into build/
   UV as a burn time, air quality as health guidance, pressure as a trend.
 - **Per-activity advice** for running and cycling.
 - **Sun arc** showing how much daylight is left, not just when it started.
+- **Rain nowcast** — "Rain starting in about 15 minutes" — from 15-minute
+  precipitation data. The banner renders nothing when the hour is dry, because
+  a permanent alert is one nobody reads.
+- **Radar map** with a time scrubber over 13 past frames, plus an infrared
+  satellite layer. The map is mounted only when its tab is first opened.
+- **Saved locations** with an at-a-glance dashboard strip, persisted in
+  IndexedDB.
+- **Recent searches**, recorded on selection rather than on keystroke.
 - **Offline.** The last successful forecast is cached in IndexedDB and served
   with a timestamp when the network is gone — see [Offline](#offline).
 
@@ -109,11 +117,27 @@ Four rules hold the structure together:
 
 ### Bundle splitting
 
-The charting library is the heaviest dependency in the project, so the hourly
-chart is lazy-loaded into its own chunk and the main bundle stays around 106 kB
-gzipped instead of 202 kB. The hero and the daily forecast, which a user reads
-first, ship in the main bundle. PLAN §5 targets a first contentful paint under
-1.5s on 3G, and PLAN §8 names lazy-loading as the mitigation for bundle weight.
+The two heaviest dependencies are both kept out of the main bundle:
+
+| Chunk        | Size (gzip) | Loaded when                     |
+| ------------ | ----------- | ------------------------------- |
+| main         | ~113 kB     | immediately                     |
+| Recharts     | ~99 kB      | the Hourly tab renders          |
+| Leaflet      | ~44 kB      | the Radar tab is opened         |
+
+The radar is not merely lazy-rendered: it is not mounted at all until its tab is
+first activated, so someone who never opens the map never downloads Leaflet.
+PLAN §5 targets a first contentful paint under 1.5s on 3G, and PLAN §8 names
+lazy-loading as the mitigation for bundle weight.
+
+### Map layers
+
+Precipitation radar and infrared satellite come from RainViewer, free and
+keyless. PLAN §9 asks for "temperature and precipitation layers"; a temperature
+*tile* layer has no keyless source — OpenWeather's is free but needs a key, and
+every other provider wants a paid plan. So the temperature layer is wired up but
+hidden unless `REACT_APP_OPENWEATHER_API_KEY` is set, and the map is fully
+functional without it.
 
 ## Design system
 

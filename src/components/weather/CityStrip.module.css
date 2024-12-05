@@ -1,0 +1,173 @@
+/*
+ * Saved-location cards.
+ *
+ * PLAN 4.4: "A swipeable or tabbed view showing cards for each saved location
+ * with current temp, high/low, and condition icon. This transforms the app from
+ * a single-city checker into a travel/work dashboard."
+ *
+ * Implemented as a horizontally scrolling strip, which is both the swipe
+ * gesture on touch and a scroll region on desktop — one mechanism instead of
+ * two, and it needs no tab state to keep in sync with the active city.
+ */
+
+.strip {
+  display: flex;
+  gap: var(--spacing-md);
+  overflow-x: auto;
+  padding-bottom: var(--spacing-xs);
+  /* Snap so a card lands flush rather than half-cut after a swipe. */
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.strip:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--rounded-sm);
+}
+
+.card {
+  /* Anchors the stretched select button. */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex: 0 0 auto;
+  width: 9.5rem;
+  padding: var(--spacing-base);
+  border-radius: var(--rounded-md);
+  border: 1px solid var(--color-hairline);
+  background-color: var(--color-surface-soft);
+  text-align: left;
+  scroll-snap-align: start;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    border-color var(--motion-fast) var(--motion-ease);
+}
+
+.card:hover {
+  background-color: var(--color-surface-strong);
+}
+
+/*
+ * Stretched target: invisible, covers the card, carries the accessible name.
+ * Kept as a real button rather than a click handler on the card so it is
+ * focusable and activatable from the keyboard.
+ */
+.selectButton {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: var(--rounded-md);
+  background: transparent;
+  /* Sits under the content so text stays selectable, but the card's own
+     padding means the two never overlap the remove control. */
+  z-index: 0;
+}
+
+/* The focus ring belongs on the card, not on an invisible overlay. */
+.selectButton:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/*
+ * The city currently on screen. Border and weight change together, so the
+ * distinction does not rely on colour alone (PLAN 4.7).
+ */
+.cardActive {
+  border-color: var(--color-primary);
+  border-width: 2px;
+  background-color: var(--color-canvas);
+  /* Compensate for the thicker border so the row does not shift. */
+  padding: calc(var(--spacing-base) - 1px);
+}
+
+.name {
+  /* Above the stretched button so the text is not swallowed by it. */
+  position: relative;
+  z-index: 1;
+  font-size: var(--type-body-sm-size);
+  font-weight: 600;
+  color: var(--color-ink);
+  /* Two lines then ellipsis: "San Francisco" fits, "Llanfairpwllgwyngyll"
+     does not need to. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.country {
+  display: block;
+  font-weight: 400;
+  font-size: var(--type-caption-sm-size);
+  color: var(--color-muted);
+}
+
+.icon {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  color: var(--color-ink);
+}
+
+.temperature {
+  position: relative;
+  z-index: 1;
+  font-size: var(--type-display-md-size);
+  font-weight: var(--type-display-md-weight);
+  line-height: 1.15;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.range {
+  position: relative;
+  z-index: 1;
+  font-size: var(--type-caption-sm-size);
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.cardActions {
+  position: relative;
+  /* Above the stretched select button so remove stays independently clickable. */
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-xs);
+  margin-top: auto;
+}
+
+.removeButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--rounded-full);
+  color: var(--color-muted);
+  transition: color var(--motion-fast) var(--motion-ease);
+}
+
+.removeButton:hover {
+  color: var(--color-error-text);
+}
+
+.placeholder {
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+  padding: var(--spacing-md) 0;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}

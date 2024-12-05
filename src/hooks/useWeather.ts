@@ -24,7 +24,7 @@ import {
   type CachedForecast,
 } from "../lib/db";
 import type { Coordinates, WeatherData } from "../types/weather";
-import type { ActiveLocation } from "./useActiveLocation";
+import type { ActiveLocation } from "../store/useAppStore";
 import { useDebouncedValue } from "./useDebouncedValue";
 
 /** Three decimals is ~100 m, well below what a weather grid can resolve. */

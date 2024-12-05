@@ -1,0 +1,83 @@
+/*
+ * Precipitation nowcast banner.
+ *
+ * PLAN 4.1 calls this the highest-value feature in the revamp, so it sits
+ * directly under the hero. It is deliberately absent when nothing is happening:
+ * a banner that is always there stops being read, which is the failure mode
+ * that makes precipitation alerts useless.
+ */
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-base);
+  padding: var(--spacing-base) var(--spacing-lg);
+  border-radius: var(--rounded-md);
+  background-color: var(--wx-glass-bg);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--wx-glass-border);
+  /* Severity is carried on the left rail, matching the metric tiles. */
+  border-left: 4px solid var(--nowcast-accent, var(--color-primary));
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .banner {
+    background-color: var(--color-surface-card);
+  }
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--nowcast-accent, var(--color-primary));
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.headline {
+  font-size: var(--type-body-md-size);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.detail {
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}
+
+/*
+ * A compact 60-minute strip. Bars are drawn per 15-minute step, so the shape of
+ * the hour is visible at a glance rather than only described in words.
+ */
+.strip {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 2rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.bar {
+  width: 6px;
+  min-height: 3px;
+  border-radius: 2px;
+  background-color: var(--nowcast-accent, var(--color-primary));
+  opacity: 0.55;
+}
+
+.barNow {
+  opacity: 1;
+}
+
+@media (max-width: 520px) {
+  /* The words carry the message; the strip is a nicety. */
+  .strip {
+    display: none;
+  }
+}
