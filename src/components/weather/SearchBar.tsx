@@ -14,6 +14,7 @@ import styles from "./SearchBar.module.css";
 import { LocationIcon, SearchIcon, SpinnerIcon, SunIcon } from "../ui/icons";
 import { useLocationSearch } from "../../hooks/useWeather";
 import type { GeolocationStatus } from "../../hooks/useGeolocation";
+import type { RecentSearch } from "../../store/useAppStore";
 import type { Coordinates } from "../../types/weather";
 
 export interface SearchBarProps {
@@ -24,12 +25,17 @@ export interface SearchBarProps {
   ) => void;
   onUseCurrentLocation: () => void;
   geolocationStatus: GeolocationStatus;
+  /** Shown in the dropdown before the user has typed anything. */
+  recentSearches?: RecentSearch[];
+  onClearRecent?: () => void;
 }
 
 export function SearchBar({
   onSelect,
   onUseCurrentLocation,
   geolocationStatus,
+  recentSearches = [],
+  onClearRecent,
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -43,7 +49,15 @@ export function SearchBar({
     useLocationSearch(query, { enabled: open });
 
   const suggestions = results ?? [];
-  const showPopup = open && settledQuery.length >= 2;
+  const showSuggestions = open && settledQuery.length >= 2;
+  /*
+   * Recents only appear while the field is empty. Once someone is typing, the
+   * list they want is the one matching what they typed — showing history
+   * underneath it is noise that pushes the results down.
+   */
+  const showRecents =
+    open && query.trim().length < 2 && recentSearches.length > 0;
+  const showPopup = showSuggestions || showRecents;
 
   // Reset the highlight whenever the result set changes underneath it, so the
   // active option can never point at a row that no longer exists.
@@ -63,6 +77,21 @@ export function SearchBar({
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
   }, [open]);
+
+  const close = () => {
+    setQuery("");
+    setOpen(false);
+    setActiveIndex(-1);
+    inputRef.current?.blur();
+  };
+
+  const chooseRecent = (entry: RecentSearch) => {
+    onSelect(entry.coords, entry.name, {
+      region: entry.region,
+      country: entry.country,
+    });
+    close();
+  };
 
   const choose = (index: number) => {
     const place = suggestions[index];
@@ -135,6 +164,7 @@ export function SearchBar({
               aria-expanded={showPopup}
               aria-controls={listboxId}
               aria-autocomplete="list"
+              aria-haspopup="listbox"
               aria-activedescendant={
                 activeIndex >= 0 ? `${listboxId}-option-${activeIndex}` : undefined
               }
@@ -161,9 +191,48 @@ export function SearchBar({
               className={styles.suggestions}
               id={listboxId}
               role="listbox"
-              aria-label="City suggestions"
+              aria-label={
+                showSuggestions ? "City suggestions" : "Recent searches"
+              }
             >
-              {suggestions.map((place, index) => (
+              {showRecents && (
+                <li className={styles.recentsHeader} role="presentation">
+                  <span>Recent</span>
+                  {onClearRecent && (
+                    <button
+                      type="button"
+                      className={styles.clearRecents}
+                      onClick={() => {
+                        onClearRecent();
+                        inputRef.current?.focus();
+                      }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </li>
+              )}
+
+              {showRecents &&
+                recentSearches.map((entry) => (
+                  <li key={`${entry.coords.lat},${entry.coords.lon}`}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected="false"
+                      className={styles.suggestion}
+                      onClick={() => chooseRecent(entry)}
+                    >
+                      <span className={styles.suggestionName}>{entry.name}</span>
+                      <span className={styles.suggestionMeta}>
+                        {[entry.region, entry.country].filter(Boolean).join(", ")}
+                      </span>
+                    </button>
+                  </li>
+                ))}
+
+              {showSuggestions &&
+                suggestions.map((place, index) => (
                 <li key={place.id}>
                   <button
                     type="button"
@@ -195,12 +264,12 @@ export function SearchBar({
                 </li>
               ))}
 
-              {isEmpty && (
+              {showSuggestions && isEmpty && (
                 <li className={styles.suggestionEmpty} role="presentation">
                   No places match “{settledQuery}”.
                 </li>
               )}
-              {isFetching && suggestions.length === 0 && (
+              {showSuggestions && isFetching && suggestions.length === 0 && (
                 <li className={styles.suggestionEmpty} role="presentation">
                   Searching…
                 </li>

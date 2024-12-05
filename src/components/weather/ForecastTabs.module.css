@@ -1,0 +1,61 @@
+/*
+ * Hourly / Radar switcher.
+ *
+ * A segmented control rather than underlined tabs: the two options are two
+ * views of the same data, and the pill reads as a toggle between them. The
+ * panel below is a sibling, not a nested card, because both panels already
+ * render their own Card.
+ */
+
+.tablist {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  margin-bottom: var(--spacing-md);
+  border-radius: var(--rounded-full);
+  background-color: var(--wx-glass-bg);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid var(--wx-glass-border);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tablist {
+    background-color: var(--color-surface-strong);
+  }
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  /* 44px tall: this is a primary navigation control and needs a real target. */
+  min-height: 2.5rem;
+  padding: 0 var(--spacing-base);
+  border-radius: var(--rounded-full);
+  font-size: var(--type-body-sm-size);
+  font-weight: 500;
+  color: var(--color-ink);
+  opacity: 0.7;
+  transition:
+    background-color var(--motion-fast) var(--motion-ease),
+    opacity var(--motion-fast) var(--motion-ease);
+}
+
+.tab:hover {
+  opacity: 1;
+}
+
+.tabActive {
+  background-color: var(--color-canvas);
+  opacity: 1;
+  box-shadow: var(--shadow-float);
+}
+
+/*
+ * Hidden panels use the `hidden` attribute, which the browser enforces. This
+ * rule only exists so the panel does not inherit the tablist's flex context.
+ */
+.panel[hidden] {
+  display: none;
+}
