@@ -1,17 +1,49 @@
 {
   "short_name": "Mero Mausam",
   "name": "Mero Mausam — Weather",
-  "description": "Current conditions, 7-day forecast and hourly outlook for any city.",
-  "icons": [
-    {
-      "src": "favicon.ico",
-      "sizes": "128x128 64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    }
-  ],
+  "description": "Current conditions, a 7-day forecast, a minute-by-minute rain nowcast and radar for any city.",
   "start_url": ".",
+  "scope": ".",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#ff385c",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "categories": ["weather", "utilities"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "maskable-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "My location",
+      "short_name": "Here",
+      "description": "Open the forecast for where you are now",
+      "url": "/?here=1",
+      "icons": [{ "src": "pwa-192x192.png", "sizes": "192x192" }]
+    }
+  ]
 }
