@@ -1,0 +1,139 @@
+/*
+ * Severe weather alert banner.
+ *
+ * PLAN 4.3: "a prominent but non-intrusive banner with severity colour-coding
+ * (yellow/orange/red)". Prominent means it sits directly under the header, above
+ * everything else. Non-intrusive means it is a banner and not a modal — the
+ * app must stay usable, and a forecast the user cannot read is not safer than
+ * one they can.
+ */
+
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  padding: var(--spacing-base) var(--spacing-lg);
+  border-radius: var(--rounded-md);
+  border: 1px solid var(--alert-border, var(--color-hairline));
+  border-left: 4px solid var(--alert-accent, var(--color-primary));
+  background-color: var(--alert-surface, var(--color-surface-soft));
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--alert-accent, var(--color-primary));
+  margin-top: 2px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+}
+
+.event {
+  font-size: var(--type-body-md-size);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.severity {
+  font-size: var(--type-badge-size);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: var(--rounded-full);
+  background-color: var(--alert-accent, var(--color-primary));
+  color: #ffffff;
+}
+
+.window {
+  font-size: var(--type-caption-sm-size);
+  color: var(--color-muted);
+}
+
+.description {
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-leading);
+  color: var(--color-body);
+}
+
+/*
+ * The full NWS text runs to several paragraphs. Clamping it keeps the banner
+ * from pushing the forecast off the first screen, and the toggle is right there
+ * for anyone who wants the detail.
+ */
+.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.toggle {
+  align-self: flex-start;
+  font-size: var(--type-body-sm-size);
+  font-weight: 500;
+  color: var(--primary-text, var(--color-primary));
+  padding: 2px 0;
+}
+
+.toggle:hover {
+  text-decoration: underline;
+}
+
+.sender {
+  font-size: var(--type-caption-sm-size);
+  color: var(--color-muted);
+}
+
+/* ------------------------------------------------------------ severity */
+
+.banner[data-severity="minor"] {
+  --alert-accent: var(--wx-alert-minor);
+  --alert-surface: var(--wx-alert-minor-surface);
+  --alert-border: var(--wx-alert-minor);
+}
+
+.banner[data-severity="moderate"] {
+  --alert-accent: var(--wx-alert-moderate);
+  --alert-surface: var(--wx-alert-moderate-surface);
+  --alert-border: var(--wx-alert-moderate);
+}
+
+.banner[data-severity="severe"] {
+  --alert-accent: var(--wx-alert-severe);
+  --alert-surface: var(--wx-alert-severe-surface);
+  --alert-border: var(--wx-alert-severe);
+  /* White on the accent, so the text flips with it. */
+  --color-body: #ffffff;
+  --color-ink: #ffffff;
+  --color-muted: rgb(255 255 255 / 82%);
+}
+
+.banner[data-severity="extreme"] {
+  --alert-accent: var(--wx-alert-extreme);
+  --alert-surface: var(--wx-alert-extreme-surface);
+  --alert-border: var(--wx-alert-extreme);
+  --color-body: #ffffff;
+  --color-ink: #ffffff;
+  --color-muted: rgb(255 255 255 / 82%);
+  --primary-text: #ffffff;
+}
+
+/* The severity pill needs a readable pairing against its own fill. */
+.banner[data-severity="severe"] .severity,
+.banner[data-severity="extreme"] .severity {
+  background-color: rgb(255 255 255 / 22%);
+  color: #ffffff;
+}

@@ -144,7 +144,7 @@
   height: 20px;
   margin-top: -7px;
   border-radius: var(--rounded-full);
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-solid);
   border: 2px solid var(--color-canvas);
   box-shadow: var(--shadow-float);
 }
@@ -153,7 +153,7 @@
   width: 20px;
   height: 20px;
   border-radius: var(--rounded-full);
-  background-color: var(--color-primary);
+  background-color: var(--color-primary-solid);
   border: 2px solid var(--color-canvas);
 }
 
