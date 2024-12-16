@@ -15,6 +15,23 @@
   --color-primary: #ff385c;
   --color-primary-active: #e00b41;
   --color-primary-disabled: #ffd1da;
+
+  /*
+   * Two derived accents, both because Rausch cannot do every job at once.
+   *
+   * `--color-primary-text` exists because Rausch on white measures 3.1:1 —
+   * fine as a fill, short of the 4.5:1 WCAG AA needs for body text. DESIGN.md
+   * documents Rausch as a fill and never sets body copy in it, so this is the
+   * spec's own intent made explicit rather than a deviation from it.
+   *
+   * `--color-primary-solid` is the fill behind white text. Rausch Active is a
+   * documented token (#e00b41) that measures 4.9:1 against white, so the
+   * alternative was either unreadable button labels or a colour invented for
+   * the purpose.
+   */
+  --color-primary-text: #b81f3f;
+  --color-primary-solid: #e00b41;
+
   --color-error-text: #c13515;
   --color-error-text-hover: #b32505;
   --color-legal-link: #428bff;
@@ -165,14 +182,28 @@
 
   /* Precip intensity, light to heavy. */
   --wx-rain-light: #a8d5ff;
-  --wx-rain-moderate: #4a9de0;
+  /* Darkened from #4a9de0 so the marker clears 3:1 on a soft surface. */
+  --wx-rain-moderate: #2f7fc4;
   --wx-rain-heavy: #0b4f9e;
 
   /* Temperature curve. Cool-leaning so it never reads as the brand accent. */
   --wx-chart-temperature: #428bff;
 
-  /* Sun arc. Warm, but muted enough to sit under the primary accent. */
-  --wx-sun-accent: #f0a02a;
+  /*
+   * Alert severity. Yellow / orange / red per PLAN 4.3, plus a surface tint for
+   * each so the banner has weight without a saturated block of colour.
+   */
+  --wx-alert-minor: #b8860b;
+  --wx-alert-minor-surface: #fdf6e3;
+  --wx-alert-moderate: #d2691e;
+  --wx-alert-moderate-surface: #fdf0e4;
+  --wx-alert-severe: #c13515;
+  --wx-alert-severe-surface: #fbebe6;
+  --wx-alert-extreme: #7a1f2b;
+  --wx-alert-extreme-surface: #f7e8ea;
+
+  /* Sun arc. Warm, but dark enough to clear 3:1 on a white card. */
+  --wx-sun-accent: #c47a00;
   --wx-sun-accent-soft: #ffd08a;
 
   /* Ultraviolet severity. */
@@ -218,11 +249,19 @@
   --color-primary-disabled: #6b2534;
   --color-on-primary: #ffffff;
 
+  /* Rausch clears 4.5:1 as text on a dark canvas, so links can use it directly
+     — but white *on* Rausch is 3.5:1 regardless of theme, so the button fill
+     darkens here too. */
+  --color-primary-text: var(--color-primary);
+  --color-primary-solid: #e00b41;
+
+  /* #c13515 measures 3.4:1 on a dark canvas; this is the same red lifted. */
+  --color-error-text: #ff7059;
+
   --shadow-float: rgb(0 0 0 / 30%) 0 0 0 1px, rgb(0 0 0 / 40%) 0 2px 6px 0,
     rgb(0 0 0 / 50%) 0 4px 8px 0;
 
   --wx-rain-light: #4a7ba8;
-  --wx-rain-moderate: #3a7fc0;
   --wx-rain-heavy: #2b6cb0;
 
   --wx-glass-bg: rgb(26 26 26 / 72%);
@@ -231,6 +270,20 @@
   --wx-chart-temperature: #6aa9ff;
   --wx-sun-accent: #ffc35c;
   --wx-sun-accent-soft: #8a6a34;
+
+  /* Alert surfaces darken to a tint rather than a wash of colour. */
+  --wx-alert-minor: #e0b341;
+  --wx-alert-minor-surface: #2b2416;
+  --wx-alert-moderate: #e88a45;
+  --wx-alert-moderate-surface: #2e2117;
+  --wx-alert-severe: #e2684a;
+  --wx-alert-severe-surface: #2f1a17;
+  --wx-alert-extreme: #e08594;
+  --wx-alert-extreme-surface: #321a1e;
+
+  /* Purple on a dark card measured 2.5:1, so it is lifted here. */
+  --wx-aqi-very-unhealthy: #b06fd0;
+  --wx-rain-moderate: #4a9de0;
 }
 
 /*
@@ -263,6 +316,17 @@
   --color-muted-soft: #b8b8b8;
   --color-hairline: #9a9a9a;
   --color-hairline-soft: #7d7d7d;
+
+  /*
+   * The severity scales are re-declared here rather than inherited from the
+   * light high-contrast block above. That block darkens them for a white
+   * background, which on a dark one would leave them at roughly 2.8:1 —
+   * checked by `styles/contrast.test.ts`.
+   */
+  --wx-aqi-moderate: #e8c04a;
+  --wx-aqi-sensitive: #f0a05a;
+  --wx-uv-moderate: #e8c04a;
+  --wx-uv-high: #f0a05a;
 
   --wx-glass-bg: rgb(0 0 0 / 88%);
   --wx-glass-border: #ffffff;

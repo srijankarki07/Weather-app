@@ -38,6 +38,7 @@
   gap: var(--spacing-sm);
   font-size: var(--type-title-md-size);
   font-weight: 700;
+  /* WCAG exempts logotypes from contrast minimums, so this keeps Rausch. */
   color: var(--color-primary);
   white-space: nowrap;
   /* The wordmark is the one place the accent appears in the chrome. */
@@ -102,7 +103,8 @@
   width: 2.75rem;
   height: 2.75rem;
   border-radius: var(--rounded-full);
-  background-color: var(--color-primary);
+  /* Carries a white glyph, so it needs the 4.5:1 fill. */
+  background-color: var(--color-primary-solid);
   color: var(--color-on-primary);
   flex-shrink: 0;
   transition: background-color var(--motion-fast) var(--motion-ease);
@@ -246,7 +248,7 @@
 .clearRecents {
   font-size: var(--type-caption-sm-size);
   font-weight: 500;
-  color: var(--color-primary);
+  color: var(--color-primary-text);
   text-transform: none;
   letter-spacing: 0;
   padding: 4px 8px;

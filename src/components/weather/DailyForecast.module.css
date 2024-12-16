@@ -34,7 +34,8 @@
 
 /* Today carries the accent so the eye lands on it first. */
 .today .day {
-  color: var(--color-primary);
+  /* Not Rausch: this is 14px text and needs 4.5:1. */
+  color: var(--color-primary-text);
   font-weight: 700;
 }
 
