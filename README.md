@@ -44,6 +44,12 @@ npm run build     # production bundle into build/
 - **Saved locations** with an at-a-glance dashboard strip, persisted in
   IndexedDB.
 - **Recent searches**, recorded on selection rather than on keystroke.
+- **Severe weather alerts** from the National Weather Service, with severity
+  colour-coding and the full bulletin one tap away.
+- **Dark mode, high contrast and reduced motion**, with light/dark/auto themes
+  and a contrast-audited palette.
+- **Installable PWA** with a service worker, an offline app shell and an update
+  prompt that waits rather than reloading under your thumb.
 - **Offline.** The last successful forecast is cached in IndexedDB and served
   with a timestamp when the network is gone — see [Offline](#offline).
 
@@ -158,24 +164,57 @@ Two deliberate deviations from the spec:
   rather than introducing a second set of components. The token layer for these
   is in place; the control that switches between them arrives in Phase 4.
 
+## PWA and offline
+
+The service worker is built by create-react-app's Workbox integration from
+[`src/service-worker.js`](./src/service-worker.js). It precaches the app shell
+and every split chunk, serves map tiles cache-first with a 300-entry cap, and
+runs weather API requests stale-while-revalidate.
+
+Updates do not apply themselves. A waiting worker raises a prompt, because
+silently reloading a page someone is reading — losing a map position or an open
+search — is worse than an extra tap.
+
+## Notifications
+
+Severe weather alerts can raise a notification, with one honest limitation:
+**there is no push, and there cannot be without a server.** PLAN §4.3 asks for
+Web Push and PLAN §8 answers itself — push needs "a backend or a service like
+Firebase Cloud Messaging" — and this project has no backend by instruction. So
+notifications fire only while the app is open, and the settings panel says so
+rather than implying a storm warning would wake you.
+
 ## Accessibility
 
-Implemented so far, per PLAN §4.7:
+PLAN §3 sets WCAG 2.1 AA as a success metric and PLAN §9 wants a Lighthouse
+accessibility score of 90+. What that means in this codebase:
 
-- Search is a real `role="combobox"` with a listbox popup, operable by keyboard
-  (arrows, Enter, Escape) with `aria-activedescendant` tracking the active
-  option. Suggestions activate on `click`, so keyboard and assistive-technology
-  users can select one, not just pointer users.
-- An `aria-live` region announces the current conditions when they change.
-- A skip link jumps past the sticky header.
-- Sizes are in relative units, so the layout survives browser text scaling.
-- `prefers-reduced-motion` is honoured globally, and skeletons fall back to a
-  pulse rather than a sweep.
-- Loading states are single `role="status"` regions, so a screen reader hears
-  one message instead of every skeleton.
+- **A contrast audit that runs as a test.** [`src/styles/contrast.test.ts`](./src/styles/contrast.test.ts)
+  reads `tokens.css`, resolves the token cascade for all four theme
+  combinations, and asserts WCAG ratios on every foreground/background pair the
+  palette can produce — 138 checks. Changing a colour in the stylesheet and
+  forgetting its contrast fails the build. This is also what found and fixed six
+  real failures, including white-on-Rausch buttons at 3.5:1.
+- **Rausch is not used for text.** Rausch on white measures 3.1:1, short of the
+  4.5:1 body text needs. `--color-primary-text` and `--color-primary-solid` are
+  derived from it for those two jobs; the one exception is the wordmark, which
+  WCAG exempts as a logotype.
+- **Search is a real `role="combobox"`** operable by keyboard with
+  `aria-activedescendant`. Suggestions activate on `click`, not `pointerdown`, so
+  keyboard and assistive-technology users can select one.
+- **Charts carry a text alternative.** The SVG is `aria-hidden` and the same
+  numbers are exposed as a visually-hidden table.
+- **The map is not `aria-hidden`** — it holds focusable controls, and hiding a
+  focusable element from the accessibility tree is an ARIA violation.
+- Single `role="status"` loading regions, a skip link, `prefers-reduced-motion`
+  plus a manual override, relative units throughout, and a high-contrast mode
+  that removes the background gradients entirely.
 
-Still to come: the high-contrast toggle, keyboard access to chart data points,
-and a contrast pass over the full palette.
+## Theming
+
+`auto` (the default) follows the sun at the location being viewed rather than
+the clock in your browser, so checking Sydney from London after dark still shows
+Sydney in daylight. The fallback before the forecast loads is 19:00–06:00 local.
 
 ## Testing
 

@@ -21,7 +21,11 @@ import App from "./App";
 import { queryClient } from "./lib/queryClient";
 import { db, readCachedForecast } from "./lib/db";
 import { DEFAULT_LOCATION } from "./config";
-import { useAppStore, FALLBACK_LOCATION } from "./store/useAppStore";
+import {
+  useAppStore,
+  FALLBACK_LOCATION,
+  DEFAULT_PREFERENCES,
+} from "./store/useAppStore";
 import {
   buildForecastFixture,
   mockWeatherFetch,
@@ -45,7 +49,21 @@ beforeEach(async () => {
   useAppStore.setState({
     activeLocation: FALLBACK_LOCATION,
     recentSearches: [],
+    preferences: DEFAULT_PREFERENCES,
   });
+
+  /*
+   * Theme, contrast and motion are written straight onto <html> by
+   * `useThemeEffect`, so they outlive the component tree. Without clearing
+   * them a preference set by one test silently applies to every test after it.
+   */
+  for (const attribute of [
+    "data-theme",
+    "data-contrast",
+    "data-reduce-motion",
+  ]) {
+    document.documentElement.removeAttribute(attribute);
+  }
 
   /*
    * Retries are right in production but wrong here: the default policy backs
@@ -375,6 +393,107 @@ describe("lazy-loaded chart", () => {
     // reader, so its presence is the accessibility contract.
     const table = screen.getByRole("table");
     expect(within(table).getAllByRole("row").length).toBeGreaterThan(12);
+  });
+});
+
+describe("preferences", () => {
+  async function openSettings() {
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Settings" }));
+    return { user, panel: await screen.findByRole("dialog", { name: "Settings" }) };
+  }
+
+  it("switches the whole app to imperial", async () => {
+    mockWeatherFetch();
+    render(<App />);
+    await waitFor(() => expect(hero().getByText("24")).toBeInTheDocument());
+
+    const { user, panel } = await openSettings();
+    // 24.3°C is 75.7°F, so the hero should read 76 once the unit changes.
+    await user.click(within(panel).getByRole("radio", { name: "°F" }));
+
+    await waitFor(() => expect(hero().getByText("76")).toBeInTheDocument());
+    expect(hero().queryByText("24")).not.toBeInTheDocument();
+  });
+
+  it("applies the chosen theme to the document", async () => {
+    mockWeatherFetch();
+    render(<App />);
+    await waitFor(() => expect(hero().getByText("24")).toBeInTheDocument());
+
+    const { user, panel } = await openSettings();
+    await user.click(within(panel).getByRole("radio", { name: /^Dark/ }));
+
+    await waitFor(() =>
+      expect(document.documentElement).toHaveAttribute("data-theme", "dark")
+    );
+
+    await user.click(within(panel).getByRole("radio", { name: /^Light/ }));
+    await waitFor(() =>
+      expect(document.documentElement).toHaveAttribute("data-theme", "light")
+    );
+  });
+
+  it("toggles high contrast and reduced motion as switches", async () => {
+    mockWeatherFetch();
+    render(<App />);
+    await waitFor(() => expect(hero().getByText("24")).toBeInTheDocument());
+
+    const { user, panel } = await openSettings();
+
+    const contrast = within(panel).getByRole("switch", {
+      name: /high contrast/i,
+    });
+    expect(contrast).toHaveAttribute("aria-checked", "false");
+    await user.click(contrast);
+    await waitFor(() =>
+      expect(document.documentElement).toHaveAttribute("data-contrast", "high")
+    );
+
+    await user.click(
+      within(panel).getByRole("switch", { name: /reduce motion/i })
+    );
+    await waitFor(() =>
+      expect(document.documentElement).toHaveAttribute(
+        "data-reduce-motion",
+        "true"
+      )
+    );
+  });
+
+  it("persists preferences across a reload", async () => {
+    mockWeatherFetch();
+    const first = render(<App />);
+    await waitFor(() => expect(hero().getByText("24")).toBeInTheDocument());
+
+    const { user, panel } = await openSettings();
+    await user.click(within(panel).getByRole("radio", { name: "°F" }));
+    await waitFor(() => expect(hero().getByText("76")).toBeInTheDocument());
+
+    first.unmount();
+    queryClient.clear();
+    // Simulates a return visit: the store is rebuilt from localStorage.
+    useAppStore.setState({
+      activeLocation: FALLBACK_LOCATION,
+      recentSearches: [],
+      preferences: { ...useAppStore.getState().preferences },
+    });
+
+    render(<App />);
+    await waitFor(() => expect(hero().getByText("76")).toBeInTheDocument());
+  });
+
+  it("exposes notifications as a labelled control", async () => {
+    mockWeatherFetch();
+    render(<App />);
+    await waitFor(() => expect(hero().getByText("24")).toBeInTheDocument());
+
+    const { panel } = await openSettings();
+    // jsdom has no Notification API, so the copy must explain the limitation
+    // rather than offering a button that cannot work.
+    expect(
+      within(panel).getByText(/does not support notifications/i)
+    ).toBeInTheDocument();
   });
 });
 
