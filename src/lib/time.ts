@@ -107,3 +107,17 @@ export function formatRelativePast(ms: number, now: number = Date.now()): string
   const days = Math.round(hours / 24);
   return days === 1 ? "yesterday" : `${days} days ago`;
 }
+
+/**
+ * Hour of day, 0–23, in the given zone. Used by `auto` theme mode before the
+ * forecast has loaded and there is no sunrise/sunset to consult.
+ */
+export function getLocalHour(ms: number, timezone?: string): number {
+  const formatted = formatter(timezone, { hour: 'numeric', hour12: false }).format(
+    new Date(ms)
+  );
+  const hour = Number.parseInt(formatted, 10);
+  if (Number.isNaN(hour)) return new Date(ms).getHours();
+  // `hour12: false` renders midnight as 24 in some ICU versions.
+  return hour === 24 ? 0 : hour;
+}

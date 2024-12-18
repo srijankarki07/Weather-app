@@ -10,6 +10,7 @@
  */
 
 import { useEffect, useId, useRef, useState } from "react";
+import type { ReactNode } from "react";
 import styles from "./SearchBar.module.css";
 import { LocationIcon, SearchIcon, SpinnerIcon, SunIcon } from "../ui/icons";
 import { useLocationSearch } from "../../hooks/useWeather";
@@ -28,6 +29,8 @@ export interface SearchBarProps {
   /** Shown in the dropdown before the user has typed anything. */
   recentSearches?: RecentSearch[];
   onClearRecent?: () => void;
+  /** Settings control, rendered at the end of the header row. */
+  settings?: ReactNode;
 }
 
 export function SearchBar({
@@ -36,6 +39,7 @@ export function SearchBar({
   geolocationStatus,
   recentSearches = [],
   onClearRecent,
+  settings,
 }: SearchBarProps) {
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -303,6 +307,8 @@ export function SearchBar({
             {isLocating ? "Locating…" : "My location"}
           </span>
         </button>
+
+        {settings}
       </div>
     </header>
   );

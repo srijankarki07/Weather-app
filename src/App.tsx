@@ -20,9 +20,12 @@ import { DailyForecast } from "./components/weather/DailyForecast";
 import { HighlightsGrid } from "./components/weather/HighlightsGrid";
 import { SunArc } from "./components/weather/SunArc";
 import { CityStrip, savedLocationId } from "./components/weather/CityStrip";
+import { AlertBanner } from "./components/weather/AlertBanner";
 import { WeatherSkeleton } from "./components/weather/WeatherSkeleton";
 import { ErrorState, StaleBanner, Announcer } from "./components/ui/ErrorState";
 import { Button } from "./components/ui/Button";
+import { SettingsMenu } from "./components/ui/SettingsMenu";
+import { UpdatePrompt } from "./components/ui/UpdatePrompt";
 
 import { queryClient } from "./lib/queryClient";
 import { pruneExpiredForecasts } from "./lib/db";
@@ -31,6 +34,10 @@ import { useGeolocation } from "./hooks/useGeolocation";
 import { useOnlineStatus } from "./hooks/useOnlineStatus";
 import { useSavedLocations } from "./hooks/useSavedLocations";
 import { useDocumentTitle } from "./hooks/useDocumentTitle";
+import { useThemeEffect } from "./hooks/useThemeEffect";
+import { useWeatherNotifications } from "./hooks/useWeatherNotifications";
+import { useAppShortcut } from "./hooks/useAppShortcut";
+import { usePrefetchChunks } from "./hooks/usePrefetchChunks";
 import { useAppStore } from "./store/useAppStore";
 import { formatTemperatureShort } from "./lib/units";
 import { formatRelativePast } from "./lib/time";
@@ -53,14 +60,30 @@ function WeatherApp() {
   const recentSearches = useAppStore((state) => state.recentSearches);
   const clearRecentSearches = useAppStore((state) => state.clearRecentSearches);
 
+  const preferences = useAppStore((state) => state.preferences);
+  const setPreference = useAppStore((state) => state.setPreference);
+
   const geolocation = useGeolocation();
   const online = useOnlineStatus();
   const weather = useWeather(activeLocation);
   const saved = useSavedLocations();
-
-  const units: UnitSystem = "metric";
+  const notifications = useWeatherNotifications();
 
   const data = weather.data;
+
+  /*
+   * The theme follows the *active location's* day/night, not the browser's —
+   * looking at Sydney from London after dark should show Sydney in daylight.
+   */
+  useThemeEffect({
+    preference: preferences.theme,
+    highContrast: preferences.highContrast,
+    reduceMotion: preferences.reduceMotion,
+    isNight: data?.current.isNight,
+    timezone: data?.location.timezone,
+  });
+
+  const units: UnitSystem = preferences.units;
   const condition = data?.current.condition;
   const isNight = data?.current.isNight ?? false;
   const placeName = data?.location.name ?? activeLocation.name;
@@ -73,6 +96,14 @@ function WeatherApp() {
   useEffect(() => {
     void pruneExpiredForecasts();
   }, []);
+
+  // Raise a notification when a severe alert arrives for the city on screen.
+  useEffect(() => {
+    if (!data || data.alerts.length === 0) return;
+    void notifications.notifyFor(data.alerts, data.location.name);
+    // `notifyFor` already de-duplicates by alert id, so this only fires for
+    // genuinely new alerts; the dependency on `data` is what triggers it.
+  }, [data, notifications]);
 
   const announcement = useMemo(() => {
     if (!data) return "";
@@ -95,10 +126,20 @@ function WeatherApp() {
     [setFromSearch, recordSearch]
   );
 
-  const handleUseCurrentLocation = async () => {
+  const handleUseCurrentLocation = useCallback(async () => {
     const coords = await geolocation.request();
     if (coords) setFromGeolocation(coords);
-  };
+  }, [geolocation, setFromGeolocation]);
+
+  // `/?here=1` — the PWA's "My location" launch shortcut.
+  useAppShortcut(handleUseCurrentLocation);
+
+  /*
+   * Warm the chart and map chunks once the forecast is on screen and the
+   * browser is idle. Doing it after `data` arrives rather than on mount keeps
+   * the prefetch from competing with the request that fills the page.
+   */
+  usePrefetchChunks(Boolean(data));
 
   const activeId = savedLocationId(
     activeLocation.coords.lat,
@@ -126,6 +167,14 @@ function WeatherApp() {
           geolocationStatus={geolocation.status}
           recentSearches={recentSearches}
           onClearRecent={clearRecentSearches}
+          settings={
+            <SettingsMenu
+              preferences={preferences}
+              onChange={setPreference}
+              notificationPermission={notifications.permission}
+              onEnableNotifications={notifications.requestPermission}
+            />
+          }
         />
       }
     >
@@ -137,6 +186,22 @@ function WeatherApp() {
       <Announcer message={announcement} />
 
       <AppStack>
+        <UpdatePrompt />
+
+        {/*
+          Alerts sit above everything including the stale banner: if there is a
+          tornado warning, it outranks the fact that the temperature is twenty
+          minutes old.
+        */}
+        {data && data.alerts.length > 0 && (
+          <AppStackFull>
+            <AlertBanner
+              alerts={data.alerts}
+              timezone={data.location.timezone}
+            />
+          </AppStackFull>
+        )}
+
         {/*
           Shown whenever the data on screen is not live. The timestamp is the
           whole point: a stale forecast presented as current is worse than no
