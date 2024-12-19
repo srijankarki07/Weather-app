@@ -15,10 +15,16 @@
  */
 
 import { create } from "zustand";
-import type { Coordinates, SavedLocation } from "../types/weather";
+import type {
+  Coordinates,
+  SavedLocation,
+  UnitSystem,
+  UserPreferences,
+} from "../types/weather";
 
 const ACTIVE_KEY = "mero-mausam:active-location";
 const RECENT_KEY = "mero-mausam:recent-searches";
+const PREFS_KEY = "mero-mausam:preferences";
 
 /** PLAN 4.4 asks for the last 5–10; ten is the top of that range. */
 const MAX_RECENT = 8;
@@ -65,7 +71,22 @@ interface AppState {
   recentSearches: RecentSearch[];
   recordSearch: (entry: Omit<RecentSearch, "searchedAt">) => void;
   clearRecentSearches: () => void;
+
+  /* ------------------------------------------------------- preferences */
+  preferences: UserPreferences;
+  setPreference: <K extends keyof UserPreferences>(
+    key: K,
+    value: UserPreferences[K]
+  ) => void;
 }
+
+export const DEFAULT_PREFERENCES: UserPreferences = {
+  units: "metric",
+  // PLAN 6 principle 5: "Dark mode by default for evening hours".
+  theme: "auto",
+  highContrast: false,
+  reduceMotion: false,
+};
 
 /* ------------------------------------------------------------- helpers */
 
@@ -116,6 +137,25 @@ function validateActiveLocation(value: unknown): ActiveLocation | null {
   };
 }
 
+function validatePreferences(value: unknown): UserPreferences | null {
+  const parsed = value as Partial<UserPreferences> | null;
+  if (!parsed || typeof parsed !== "object") return null;
+  const units: UnitSystem =
+    parsed.units === "imperial" ? "imperial" : DEFAULT_PREFERENCES.units;
+  const theme =
+    parsed.theme === "light" ||
+    parsed.theme === "dark" ||
+    parsed.theme === "system"
+      ? parsed.theme
+      : DEFAULT_PREFERENCES.theme;
+  return {
+    units,
+    theme,
+    highContrast: parsed.highContrast === true,
+    reduceMotion: parsed.reduceMotion === true,
+  };
+}
+
 function validateRecents(value: unknown): RecentSearch[] | null {
   if (!Array.isArray(value)) return null;
   return value
@@ -153,6 +193,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   hydrated: true,
 
   recentSearches: readStorage(RECENT_KEY, validateRecents) ?? [],
+
+  preferences:
+    readStorage(PREFS_KEY, validatePreferences) ?? DEFAULT_PREFERENCES,
 
   setActiveLocation: (location) => {
     writeStorage(ACTIVE_KEY, location);
@@ -215,5 +258,11 @@ export const useAppStore = create<AppState>((set, get) => ({
   clearRecentSearches: () => {
     writeStorage(RECENT_KEY, []);
     set({ recentSearches: [] });
+  },
+
+  setPreference: (key, value) => {
+    const next = { ...get().preferences, [key]: value };
+    writeStorage(PREFS_KEY, next);
+    set({ preferences: next });
   },
 }));

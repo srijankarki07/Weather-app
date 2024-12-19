@@ -229,7 +229,9 @@ hr {
  * clicks while guaranteeing it for keyboard users.
  */
 :focus-visible {
-  outline: 2px solid var(--color-primary);
+  /* Rausch Active rather than Rausch: a focus indicator should clear 3:1 with
+     margin, and this is the one outline the whole app relies on. */
+  outline: 2px solid var(--color-primary-active);
   outline-offset: 2px;
   border-radius: var(--rounded-xs);
 }
@@ -247,4 +249,18 @@ hr {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/*
+ * Manual reduced-motion, on top of the OS media query above. PLAN 4.7 asks for
+ * a user-facing control, and someone who needs it may not have set it at the OS
+ * level — or may be on a device where they cannot.
+ */
+[data-reduce-motion="true"] *,
+[data-reduce-motion="true"] *::before,
+[data-reduce-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }

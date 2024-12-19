@@ -46,9 +46,17 @@ const DEFAULT_TIMEOUT_MS = 10_000;
 
 export async function getJson<T>(
   url: string,
-  options: { signal?: AbortSignal; timeoutMs?: number } = {}
+  options: {
+    signal?: AbortSignal;
+    timeoutMs?: number;
+    /**
+     * Extra request headers. Needed because the National Weather Service
+     * rejects requests without a descriptive `User-Agent`.
+     */
+    headers?: Record<string, string>;
+  } = {}
 ): Promise<T> {
-  const { signal, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
+  const { signal, timeoutMs = DEFAULT_TIMEOUT_MS, headers } = options;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -60,7 +68,10 @@ export async function getJson<T>(
 
   let response: Response;
   try {
-    response = await fetch(url, { signal: controller.signal });
+    response = await fetch(url, {
+      signal: controller.signal,
+      ...(headers ? { headers } : {}),
+    });
   } catch (error) {
     const aborted = error instanceof DOMException && error.name === "AbortError";
     // An abort the caller asked for is not an error worth surfacing; rethrow it
