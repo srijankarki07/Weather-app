@@ -78,7 +78,7 @@
  * distinction does not rely on colour alone (PLAN 4.7).
  */
 .cardActive {
-  border-color: var(--color-primary);
+  border-color: var(--color-primary-active);
   border-width: 2px;
   background-color: var(--color-canvas);
   /* Compensate for the thicker border so the row does not shift. */

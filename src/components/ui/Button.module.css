@@ -37,7 +37,8 @@
 /* --------------------------------------------------------- primary */
 
 .primary {
-  background-color: var(--color-primary);
+  /* The fill behind white text; see `--color-primary-solid` in tokens.css. */
+  background-color: var(--color-primary-solid);
   color: var(--color-on-primary);
 }
 

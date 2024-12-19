@@ -33,6 +33,7 @@ import {
   usAqiToCategory,
   wmoToCondition,
 } from "./normalize";
+import { fetchAlerts } from "./alerts";
 import { reverseGeocode } from "./geocoding";
 import {
   fetchAirQuality,
@@ -325,6 +326,8 @@ export interface FetchWeatherOptions {
   label?: Partial<LocationInfo>;
   /** Set false to skip the air-quality request (Phase 1 summary screens). */
   includeAirQuality?: boolean;
+  /** Set false to skip the alerts request, e.g. for saved-location cards. */
+  includeAlerts?: boolean;
 }
 
 /**
@@ -336,7 +339,14 @@ export interface FetchWeatherOptions {
 export async function fetchWeatherBundle(
   options: FetchWeatherOptions
 ): Promise<WeatherData> {
-  const { lat, lon, signal, label, includeAirQuality = true } = options;
+  const {
+    lat,
+    lon,
+    signal,
+    label,
+    includeAirQuality = true,
+    includeAlerts = true,
+  } = options;
   const now = Date.now();
 
   const forecastPromise = fetchForecast(lat, lon, { signal });
@@ -349,7 +359,19 @@ export async function fetchWeatherBundle(
       })
     : Promise.resolve(null);
 
-  const [raw, airRaw] = await Promise.all([forecastPromise, airPromise]);
+  /*
+   * Alerts resolve to an empty array rather than rejecting — outside NWS
+   * coverage there simply are none, and that is not a failure worth surfacing.
+   */
+  const alertsPromise = includeAlerts
+    ? fetchAlerts(lat, lon, { signal })
+    : Promise.resolve([]);
+
+  const [raw, airRaw, alerts] = await Promise.all([
+    forecastPromise,
+    airPromise,
+    alertsPromise,
+  ]);
 
   const coords: Coordinates = { lat, lon };
   const resolvedLabel = label ?? (await resolveLabel(lat, lon, signal));
@@ -360,9 +382,13 @@ export async function fetchWeatherBundle(
     hourly: buildHourly(raw, now),
     daily: buildDaily(raw, now),
     minutely: buildMinutely(raw, now),
-    alerts: [],
+    alerts,
     fetchedAt: now,
-    sources: airRaw ? ["Open-Meteo", "Open-Meteo Air Quality"] : ["Open-Meteo"],
+    sources: [
+      "Open-Meteo",
+      ...(airRaw ? ["Open-Meteo Air Quality"] : []),
+      ...(alerts.length > 0 ? ["National Weather Service"] : []),
+    ],
   };
 
   if (airRaw) {
