@@ -44,6 +44,26 @@ interface NwsAlertsResponse {
 }
 
 /**
+ * Rough bounding box of NWS coverage: the contiguous states, Alaska, Hawaii and
+ * the Caribbean territories.
+ *
+ * Checked before the request rather than inferred from the response. The API
+ * answers 400 outside this box, and while the code handles that, a 400 still
+ * lands in the browser console as a failed request — which is a real error
+ * signal being polluted by an expected condition, and it fails Lighthouse's
+ * "no browser errors" audit.
+ */
+function isWithinNwsCoverage(lat: number, lon: number): boolean {
+  // Contiguous US, with a margin so border towns are not missed.
+  const contiguous = lat >= 24 && lat <= 50 && lon >= -125 && lon <= -66;
+  const alaska = lat >= 51 && lat <= 72 && lon >= -180 && lon <= -129;
+  const hawaii = lat >= 18 && lat <= 23 && lon >= -161 && lon <= -154;
+  const caribbean = lat >= 17 && lat <= 19 && lon >= -68 && lon <= -64;
+
+  return contiguous || alaska || hawaii || caribbean;
+}
+
+/**
  * Fetches active alerts for a coordinate.
  *
  * Returns an empty array — never an error — when the location is outside NWS
@@ -56,6 +76,8 @@ export async function fetchAlerts(
   lon: number,
   { signal }: { signal?: AbortSignal } = {}
 ): Promise<WeatherAlert[]> {
+  if (!isWithinNwsCoverage(lat, lon)) return [];
+
   try {
     const raw = await getJson<NwsAlertsResponse>(
       /* Rounded to four decimals, which is the precision NWS accepts. */
