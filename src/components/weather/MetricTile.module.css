@@ -124,15 +124,15 @@
 }
 
 .activityVerdict[data-verdict="good"] {
-  color: var(--wx-aqi-good);
+  color: var(--wx-status-good);
 }
 
 .activityVerdict[data-verdict="caution"] {
-  color: var(--wx-aqi-moderate);
+  color: var(--wx-status-caution);
 }
 
 .activityVerdict[data-verdict="avoid"] {
-  color: var(--color-error-text);
+  color: var(--wx-status-bad);
 }
 
 /* Trend arrow beside the hint: improving, worsening, or flat. */
@@ -143,12 +143,13 @@
   font-weight: 600;
 }
 
+/* Status text, not the rail colours: these need 4.5:1 at 13px. */
 .trendWorse {
-  color: var(--color-error-text);
+  color: var(--wx-status-bad);
 }
 
 .trendBetter {
-  color: var(--wx-aqi-good);
+  color: var(--wx-status-good);
 }
 
 .trendFlat {

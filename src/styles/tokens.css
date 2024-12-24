@@ -186,6 +186,16 @@
   --wx-rain-moderate: #2f7fc4;
   --wx-rain-heavy: #0b4f9e;
 
+  /*
+   * Status colours *as text*. The severity scales above are tuned to work as
+   * accent rails and icons, where 3:1 is the bar. The same values as 13px text
+   * measure around 3.8:1, which Lighthouse caught on the trend arrow and the
+   * activity verdicts. These are the darker/lighter versions for that job.
+   */
+  --wx-status-good: #146b39;
+  --wx-status-caution: #8a5f00;
+  --wx-status-bad: var(--color-error-text);
+
   /* Temperature curve. Cool-leaning so it never reads as the brand accent. */
   --wx-chart-temperature: #428bff;
 
@@ -284,6 +294,10 @@
   /* Purple on a dark card measured 2.5:1, so it is lifted here. */
   --wx-aqi-very-unhealthy: #b06fd0;
   --wx-rain-moderate: #4a9de0;
+
+  --wx-status-good: #4ade80;
+  --wx-status-caution: #f0c04a;
+  --wx-status-bad: var(--color-error-text);
 }
 
 /*
