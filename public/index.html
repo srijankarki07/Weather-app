@@ -32,16 +32,157 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://api.open-meteo.com" />
+    <!--
+      Loaded asynchronously. A plain stylesheet link from fonts.googleapis.com
+      is render-blocking and costs two extra round trips before the first pixel
+      — one for the CSS, one for the font file it references — which showed up
+      directly in the first contentful paint. `media="print"` makes it
+      non-blocking, and the onload handler promotes it to `all` once it arrives.
+      The Inter fallback chain in `tokens.css` means text is readable throughout.
+    -->
+    <link
+      rel="preload"
+      as="style"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      />
+    </noscript>
+
+    <!--
+      Critical shell.
+
+      This is a single-page app whose content is drawn by JavaScript, so without
+      this the first paint is an empty white page until the bundle downloads and
+      React mounts — several seconds on a slow connection. PLAN 5 targets a first
+      contentful paint under 1.5s on 3G and PLAN 4.6 wants skeleton loading
+      rather than blankness, so the skeleton the app would render anyway is
+      inlined here and paints as soon as the HTML is parsed.
+
+      React replaces everything inside #root on mount, so this costs one frame of
+      duplicated markup and buys back a blank screen. Kept inline and small for
+      the same reason it exists.
+    -->
+    <style>
+      :root {
+        --shell-ink: #222222;
+        --shell-canvas: #ffffff;
+        --shell-hairline: #dddddd;
+        --shell-skeleton: #ececec;
+        color-scheme: light dark;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --shell-ink: #f2f2f2;
+          --shell-canvas: #121212;
+          --shell-hairline: #383838;
+          --shell-skeleton: #262626;
+        }
+      }
+      html,
+      body {
+        margin: 0;
+        background-color: var(--shell-canvas);
+      }
+      body {
+        font-family: Inter, -apple-system, system-ui, Roboto, sans-serif;
+        color: var(--shell-ink);
+      }
+      #shell-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--shell-hairline);
+      }
+      #shell-mark {
+        font-weight: 700;
+        color: #ff385c;
+        white-space: nowrap;
+      }
+      #shell-field {
+        flex: 1;
+        height: 56px;
+        border: 1px solid var(--shell-hairline);
+        border-radius: 9999px;
+      }
+      #shell-main {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 24px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .shell-bar {
+        background-color: var(--shell-skeleton);
+        border-radius: 8px;
+        animation: shell-pulse 1.6s ease-in-out infinite;
+      }
+      #shell-hero {
+        background-color: var(--shell-canvas);
+        border: 1px solid var(--shell-hairline);
+        border-radius: 14px;
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      @keyframes shell-pulse {
+        50% {
+          opacity: 0.55;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .shell-bar {
+          animation: none;
+        }
+      }
+    </style>
   </head>
   <body>
     <noscript>
       Mero Mausam needs JavaScript to fetch and display the forecast. Please
       enable it to continue.
     </noscript>
-    <div id="root"></div>
+
+    <div id="root">
+      <header id="shell-header" aria-hidden="true">
+        <span id="shell-mark">Mero Mausam</span>
+        <div id="shell-field"></div>
+      </header>
+      <div id="shell-main" aria-hidden="true">
+        <div id="shell-hero">
+          <div class="shell-bar" style="width: 9rem; height: 3.5rem"></div>
+          <div class="shell-bar" style="width: 7rem; height: 1rem"></div>
+          <div class="shell-bar" style="width: 12rem; height: 0.9rem"></div>
+          <div class="shell-bar" style="width: 100%; height: 2.75rem"></div>
+        </div>
+        <div
+          class="shell-bar"
+          style="width: 100%; height: 14rem; border-radius: 14px"
+        ></div>
+      </div>
+    </div>
+
+    <!--
+      The shell above is decorative and hidden from assistive technology, so this
+      is what announces that the app is starting.
+    -->
+    <p
+      role="status"
+      style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap"
+    >
+      Loading the latest forecast…
+    </p>
   </body>
 </html>
