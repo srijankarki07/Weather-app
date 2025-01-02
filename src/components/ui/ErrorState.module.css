@@ -81,3 +81,24 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* Retry control inside a render-error fallback. Kept local rather than reusing
+   Button so the boundary has no dependency on the component tree it is
+   guarding — if Button itself is what threw, this still renders. */
+.retryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-height: 2.75rem;
+  padding: 0 var(--spacing-base);
+  border-radius: var(--rounded-sm);
+  border: 1px solid var(--color-ink);
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
+  font-size: var(--type-body-sm-size);
+  font-weight: 500;
+}
+
+.retryButton:hover {
+  background-color: var(--color-surface-soft);
+}

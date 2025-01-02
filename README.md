@@ -218,10 +218,44 @@ Sydney in daylight. The fallback before the forecast loads is 19:00–06:00 loca
 
 ## Testing
 
-`npm test` runs the suite: pure-function units, the provider→model assembler,
-and integration tests that mount the whole tree with only `fetch` stubbed.
-There is no end-to-end suite — PLAN §7 puts it in Phase 5, which this project
-skipped by choice.
+`npm test` runs 319 tests: pure-function units, the provider→model assembler,
+integration tests that mount the whole tree with only `fetch` stubbed, and two
+stylesheet audits that read the CSS directly.
+
+There is deliberately no end-to-end suite. PLAN §7 puts Playwright in Phase 5,
+and driving a real browser was judged not worth the CI cost for an app this
+size — the integration tests mount the real component tree, real query client
+and real IndexedDB (via `fake-indexeddb`), so they catch the wiring failures an
+E2E suite would.
+
+## Performance
+
+Lighthouse against the production build, served with gzip and the cache headers
+in `vercel.json` (run `npm run build && npm run preview`, then audit
+`http://localhost:8899`):
+
+| Category       | Score |
+| -------------- | ----- |
+| Accessibility  | 100   |
+| Best Practices | 100   |
+| SEO            | 100   |
+| Performance    | 84–86 |
+
+PLAN §9 asks for 90+ across the board. Three of four are at 100; performance
+sits in the mid-80s and the gap is one number: **LCP is around 3.8s**, because
+the largest element on the page is the current temperature and that cannot be
+painted before the weather API answers. Everything upstream of it is already
+fast — first contentful paint is 0.8s, total blocking time is under 200ms, and
+cumulative layout shift is 0.
+
+That 0.8s FCP came from two changes worth knowing about, since both were
+findings rather than design decisions:
+
+- An inline critical shell in `index.html`. A create-react-app bundle paints
+  nothing until the JavaScript lands, so the first paint was an empty page.
+  Inlining the skeleton the app would render anyway took FCP from 3.0s to 0.8s.
+- The Google Fonts stylesheet is loaded asynchronously. As a normal stylesheet
+  it blocked the first paint behind two extra round trips.
 
 ## Preview
 

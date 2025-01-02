@@ -54,6 +54,16 @@ export function ForecastTabs({ data, units }: ForecastTabsProps) {
     if (id === "radar") setRadarOpened(true);
   };
 
+  /**
+   * Pulls the map chunk down on hover or focus rather than on idle. A pointer
+   * resting on the tab is a much stronger signal than a timer, and it gives the
+   * download a head start on the click without costing anything for the
+   * majority of sessions that never open the map.
+   */
+  const warmRadar = () => {
+    void import("./RadarMap").catch(() => {});
+  };
+
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
     event.preventDefault();
@@ -92,6 +102,8 @@ export function ForecastTabs({ data, units }: ForecastTabsProps) {
               .filter(Boolean)
               .join(" ")}
             onClick={() => select(id)}
+            onMouseEnter={id === "radar" ? warmRadar : undefined}
+            onFocus={id === "radar" ? warmRadar : undefined}
           >
             <Icon size={16} />
             {label}

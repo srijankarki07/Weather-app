@@ -26,6 +26,7 @@ import { ErrorState, StaleBanner, Announcer } from "./components/ui/ErrorState";
 import { Button } from "./components/ui/Button";
 import { SettingsMenu } from "./components/ui/SettingsMenu";
 import { UpdatePrompt } from "./components/ui/UpdatePrompt";
+import { ErrorBoundary } from "./components/ui/ErrorBoundary";
 
 import { queryClient } from "./lib/queryClient";
 import { pruneExpiredForecasts } from "./lib/db";
@@ -257,31 +258,44 @@ function WeatherApp() {
               <NowcastBanner data={data} />
             </AppStackFull>
 
-            {/* The chart and the map both need the full width on desktop. */}
+            {/*
+              Each visualisation is wrapped separately. A charting or mapping
+              library throwing should cost its own section, not the forecast.
+            */}
             <AppStackFull>
               <div id="forecast">
-                <ForecastTabs data={data} units={units} />
+                <ErrorBoundary label="forecast chart">
+                  <ForecastTabs data={data} units={units} />
+                </ErrorBoundary>
               </div>
             </AppStackFull>
 
-            <HighlightsGrid data={data} units={units} />
+            <ErrorBoundary label="highlights">
+              <HighlightsGrid data={data} units={units} />
+            </ErrorBoundary>
 
-            <DailyForecast data={data} units={units} days={7} />
+            <ErrorBoundary label="daily forecast">
+              <DailyForecast data={data} units={units} days={7} />
+            </ErrorBoundary>
 
             <AppStackFull>
-              <SunArc data={data} />
+              <ErrorBoundary label="sun arc">
+                <SunArc data={data} />
+              </ErrorBoundary>
             </AppStackFull>
 
             <AppStackFull>
-              <CityStrip
-                locations={saved.locations}
-                units={units}
-                activeId={isCurrentSaved ? activeId : undefined}
-                onSelect={setFromSaved}
-                onRemove={(id) => void saved.removeLocation(id)}
-                onSaveCurrent={isCurrentSaved ? undefined : handleSaveCurrent}
-                currentName={placeName}
-              />
+              <ErrorBoundary label="saved locations">
+                <CityStrip
+                  locations={saved.locations}
+                  units={units}
+                  activeId={isCurrentSaved ? activeId : undefined}
+                  onSelect={setFromSaved}
+                  onRemove={(id) => void saved.removeLocation(id)}
+                  onSaveCurrent={isCurrentSaved ? undefined : handleSaveCurrent}
+                  currentName={placeName}
+                />
+              </ErrorBoundary>
             </AppStackFull>
           </>
         )}

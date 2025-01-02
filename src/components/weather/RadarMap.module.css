@@ -35,7 +35,8 @@
 .map :global(.leaflet-control-attribution) {
   background-color: var(--color-canvas);
   color: var(--color-muted);
-  font-size: 10px;
+  /* rem, so it scales with the user's text size like everything else. */
+  font-size: 0.625rem;
 }
 
 .map :global(.leaflet-control-attribution a) {
@@ -140,9 +141,11 @@
 .range::-webkit-slider-thumb {
   appearance: none;
   -webkit-appearance: none;
-  width: 20px;
-  height: 20px;
-  margin-top: -7px;
+  /* rem, so the grab handle grows for anyone using a larger text size. */
+  width: 1.25rem;
+  height: 1.25rem;
+  /* Centres the thumb on the track: (track - thumb) / 2. */
+  margin-top: calc((0.375rem - 1.25rem) / 2);
   border-radius: var(--rounded-full);
   background-color: var(--color-primary-solid);
   border: 2px solid var(--color-canvas);
@@ -150,8 +153,8 @@
 }
 
 .range::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
+  width: 1.25rem;
+  height: 1.25rem;
   border-radius: var(--rounded-full);
   background-color: var(--color-primary-solid);
   border: 2px solid var(--color-canvas);

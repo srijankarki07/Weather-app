@@ -163,6 +163,14 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
             width={width}
             height={CHART_HEIGHT}
             data={points}
+            /*
+             * Off, because Recharts otherwise puts `tabindex="0"` on the SVG —
+             * and a focusable element inside an `aria-hidden` subtree is an
+             * ARIA violation that Lighthouse flags. Recharts' keyboard layer
+             * only reaches the nearest data point anyway; the table below is
+             * the complete alternative.
+             */
+            accessibilityLayer={false}
             margin={{ top: 28, right: 16, bottom: 4, left: 16 }}
           >
               <defs>
