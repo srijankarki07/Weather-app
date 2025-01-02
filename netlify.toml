@@ -1,0 +1,38 @@
+# Netlify equivalent of `vercel.json`. Both are committed because the app is a
+# static bundle and should be deployable to either without edits.
+
+[build]
+  command = "npm run build"
+  publish = "build"
+
+# Single-page app: every path resolves to the shell, which does its own routing.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Hashed build assets never change, so they can be cached indefinitely.
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# The service worker must not be cached, or a client can be pinned to a version
+# that never sees its own replacement.
+[[headers]]
+  for = "/service-worker.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+    Service-Worker-Allowed = "/"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(self), camera=(), microphone=()"

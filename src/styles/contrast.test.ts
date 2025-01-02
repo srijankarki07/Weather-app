@@ -194,6 +194,18 @@ const TEXT_PAIRS: { foreground: string; background: string; label: string }[] = 
   { foreground: "--color-on-primary", background: "--color-primary-solid", label: "text on a primary button" },
   { foreground: "--color-error-text", background: "--color-canvas", label: "error text" },
   { foreground: "--color-error-text", background: "--color-surface-soft", label: "error text on a soft surface" },
+
+  /*
+   * Status text. These are 13px, so they need the full 4.5:1 — the severity
+   * scales they are derived from are tuned for rails and icons at 3:1, and
+   * using those directly here is exactly the bug Lighthouse caught.
+   */
+  { foreground: "--wx-status-good", background: "--color-surface-soft", label: "improving trend" },
+  { foreground: "--wx-status-good", background: "--color-surface-card", label: "good activity verdict" },
+  { foreground: "--wx-status-caution", background: "--color-surface-soft", label: "caution trend" },
+  { foreground: "--wx-status-caution", background: "--color-surface-card", label: "caution activity verdict" },
+  { foreground: "--wx-status-bad", background: "--color-surface-soft", label: "worsening trend" },
+  { foreground: "--wx-status-bad", background: "--color-surface-card", label: "avoid activity verdict" },
 ];
 
 /**
