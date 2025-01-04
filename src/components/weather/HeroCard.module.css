@@ -20,6 +20,16 @@
   gap: var(--spacing-base);
 }
 
+/* Both halves are ordinary stacked blocks by default; the desktop rules below
+   place them side by side. */
+.primary,
+.secondary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
 .reading {
   display: flex;
   align-items: baseline;
@@ -67,19 +77,40 @@
   color: var(--color-muted);
 }
 
+/*
+ * Stacked by default, inline on the wide layout.
+ *
+ * The dividers are elements, not pseudo-content, so a wrapped line used to end
+ * with a trailing rule — "Feels like 25° | 6:00 PM local |" and then nothing.
+ * Stacking on narrow screens removes the wrap entirely rather than trying to
+ * hide the divider after the fact.
+ */
 .facts {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--spacing-sm) var(--spacing-base);
+  flex-direction: column;
+  gap: 2px;
   font-size: var(--type-body-sm-size);
   color: var(--color-muted);
 }
 
 .factDivider {
+  display: none;
   width: 1px;
   height: 0.9em;
   background-color: var(--color-hairline);
+}
+
+@media (min-width: 600px) {
+  .facts {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing-sm) var(--spacing-base);
+  }
+
+  .factDivider {
+    display: block;
+  }
 }
 
 /*
@@ -87,24 +118,65 @@
  * success metric, and it is the only place besides the search orb that wears
  * the brand accent — which is what makes it read as the takeaway.
  */
+/*
+ * The verdict. No coloured rail down the side — the headline is already bold
+ * and the block already has a distinct surface, so an accent bar added weight
+ * without adding information.
+ */
 .verdict {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs) var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-base);
-  border-radius: var(--rounded-sm);
+  border-radius: var(--rounded-md);
   background-color: var(--color-surface-soft);
-  border-left: 3px solid var(--color-primary);
 }
 
 .verdictHeadline {
   font-size: var(--type-body-md-size);
   font-weight: 600;
   color: var(--color-ink);
-  flex-shrink: 0;
 }
 
 .verdictDetail {
   font-size: var(--type-body-sm-size);
   color: var(--color-muted);
+}
+
+/*
+ * Desktop: the hero runs the full width, so its content is laid out in two
+ * columns rather than stacked in a narrow one. Previously it sat in a single
+ * grid column with the other half of the row left empty, which read as a
+ * layout bug rather than a choice.
+ */
+@media (min-width: 900px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--spacing-xl);
+  }
+
+  .primary {
+    gap: var(--spacing-sm);
+    /* Centres the temperature block against the taller right-hand column. */
+    justify-content: center;
+  }
+
+  /*
+   * The icon sits beside the temperature rather than being pushed to the far
+   * edge of a half-width column, where it floated unattached in the middle of
+   * the card.
+   */
+  .top {
+    justify-content: flex-start;
+    align-items: center;
+    gap: var(--spacing-base);
+  }
+
+  .secondary {
+    gap: var(--spacing-base);
+    justify-content: center;
+  }
 }

@@ -23,7 +23,18 @@
   width: 100%;
   max-width: var(--layout-max-width);
   margin: 0 auto;
-  padding: 0 var(--layout-gutter) var(--spacing-section);
+  /*
+   * Top padding matters: the header is sticky and flush, so without it the
+   * first card butts straight up against the hairline and reads as attached to
+   * the nav rather than as page content.
+   */
+  padding: var(--spacing-xl) var(--layout-gutter) var(--spacing-section);
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding-top: var(--spacing-lg);
+  }
 }
 
 /* The scroll layout from PLAN 6: one column, generous but not airy. */
@@ -190,17 +201,36 @@
   background-image: none;
 }
 
-/* Two columns once there is room, mirroring the plan's desktop layout. */
+/*
+ * Desktop layout.
+ *
+ * A two-column grid, but every item is placed explicitly rather than left to
+ * auto-flow. Auto-flow was the earlier bug: the hero landed in column 1 and the
+ * next three items all spanned both columns, so row 1's right half stayed empty
+ * and the hero looked marooned beside a hole.
+ *
+ * `align-items: start` keeps a short card from being stretched to match a tall
+ * neighbour.
+ */
 @media (min-width: 900px) {
   .stack {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
     align-items: start;
     gap: var(--spacing-lg);
   }
 
-  /* Cards opt into spanning the full width. */
+  /* Sections that need the full measure: the hero, the chart, the city strip. */
   .full {
     grid-column: 1 / -1;
+  }
+
+  /*
+   * Halves pair up two at a time in source order. Left to auto-flow, a full
+   * width section would otherwise consume the row it lands in and leave the
+   * cell beside it empty.
+   */
+  .half {
+    grid-column: span 1;
   }
 }
