@@ -11,13 +11,19 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 
-import { AppShell, AppStack, AppStackFull } from "./components/layout/AppShell";
+import {
+  AppShell,
+  AppStack,
+  AppStackFull,
+  AppStackHalf,
+} from "./components/layout/AppShell";
 import { SearchBar } from "./components/weather/SearchBar";
 import { HeroCard } from "./components/weather/HeroCard";
 import { NowcastBanner } from "./components/weather/NowcastBanner";
 import { ForecastTabs } from "./components/weather/ForecastTabs";
 import { DailyForecast } from "./components/weather/DailyForecast";
 import { HighlightsGrid } from "./components/weather/HighlightsGrid";
+import { AirQualityCard } from "./components/weather/AirQualityCard";
 import { SunArc } from "./components/weather/SunArc";
 import { CityStrip, savedLocationId } from "./components/weather/CityStrip";
 import { AlertBanner } from "./components/weather/AlertBanner";
@@ -252,7 +258,9 @@ function WeatherApp() {
 
         {data && (
           <>
-            <HeroCard data={data} units={units} />
+            <AppStackFull>
+              <HeroCard data={data} units={units} />
+            </AppStackFull>
 
             <AppStackFull>
               <NowcastBanner data={data} />
@@ -270,19 +278,34 @@ function WeatherApp() {
               </div>
             </AppStackFull>
 
-            <ErrorBoundary label="highlights">
-              <HighlightsGrid data={data} units={units} />
-            </ErrorBoundary>
+            {/*
+              A paired row: the forecast list and the metric grid side by side.
+              Both are tall, so they balance; the sections that need the full
+              measure are explicitly marked and the rest fill the halves.
+            */}
+            <AppStackHalf>
+              <ErrorBoundary label="daily forecast">
+                <DailyForecast data={data} units={units} days={7} />
+              </ErrorBoundary>
+            </AppStackHalf>
 
-            <ErrorBoundary label="daily forecast">
-              <DailyForecast data={data} units={units} days={7} />
-            </ErrorBoundary>
+            <AppStackHalf>
+              <ErrorBoundary label="highlights">
+                <HighlightsGrid data={data} units={units} />
+              </ErrorBoundary>
+            </AppStackHalf>
 
-            <AppStackFull>
-              <ErrorBoundary label="sun arc">
+            <AppStackHalf>
+              <ErrorBoundary label="air quality">
+                <AirQualityCard data={data} />
+              </ErrorBoundary>
+            </AppStackHalf>
+
+            <AppStackHalf>
+              <ErrorBoundary label="daylight">
                 <SunArc data={data} />
               </ErrorBoundary>
-            </AppStackFull>
+            </AppStackHalf>
 
             <AppStackFull>
               <ErrorBoundary label="saved locations">

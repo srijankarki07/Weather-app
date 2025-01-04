@@ -48,8 +48,18 @@ export function AppStack({ children }: { children: ReactNode }) {
 
 /**
  * Marks a child of `AppStack` as spanning both desktop columns. Used by the
- * hourly chart, which needs the full width.
+ * hero, the chart and the city strip, which need the full measure.
  */
 export function AppStackFull({ children }: { children: ReactNode }) {
   return <div className={styles.full}>{children}</div>;
+}
+
+/**
+ * Marks a child as occupying a single column.
+ *
+ * Below the desktop breakpoint this is an ordinary block, so the markup does
+ * not change between layouts — only the grid does.
+ */
+export function AppStackHalf({ children }: { children: ReactNode }) {
+  return <div className={styles.half}>{children}</div>;
 }
