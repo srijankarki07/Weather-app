@@ -5,29 +5,30 @@
  * a timeline — that overlay is the whole point, since "18° and raining" is a
  * different afternoon from "18° and clear".
  *
- * The chart scrolls horizontally rather than compressing. Cramming 24 hours of
- * labels into a phone width produces a smear of overlapping text; letting the
- * card scroll keeps every label readable and the touch target honest.
+ * The chart fits its container rather than scrolling. It used to be a fixed
+ * pixels-per-hour strip inside an `overflow-x: auto` box, which meant it
+ * overflowed on every desktop and put a scrollbar under a chart that has
+ * nothing hidden — the width was simply wrong. It now measures the card and
+ * plots however many hours fit, so there is never anything to scroll to.
  */
 
-.scroller {
-  overflow-x: auto;
-  overflow-y: hidden;
-  /* Room for the focus ring on the chart's own focusable elements. */
-  padding-bottom: var(--spacing-xs);
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-}
-
-.scroller:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-  border-radius: var(--rounded-sm);
+.chartArea {
+  /* The measurement target; the chart is drawn at exactly this width. */
+  width: 100%;
+  min-width: 0;
 }
 
 .canvas {
-  /* Set from the component: hours x px-per-hour. */
   position: relative;
+}
+
+/*
+ * Recharts renders the surface as an SVG; `display: block` removes the inline
+ * baseline gap that would otherwise add a few stray pixels of height.
+ */
+.canvas svg {
+  display: block;
+  overflow: visible;
 }
 
 .legend {
