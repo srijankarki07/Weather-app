@@ -10,8 +10,11 @@ export interface MetricTileProps {
   /** One line of interpretation — PLAN 4.2's "so what" for each metric. */
   hint?: ReactNode;
   icon?: ReactNode;
-  /** Sets the left severity rail. Omit for metrics with no severity scale. */
-  accentColor?: string;
+  /**
+   * Colour of the severity dot beside the label. Omit for metrics with no
+   * severity scale, which then render a plain label.
+   */
+  severityColor?: string;
 }
 
 /**
@@ -29,17 +32,17 @@ export function MetricTile({
   unit,
   hint,
   icon,
-  accentColor,
+  severityColor,
 }: MetricTileProps) {
   const compact = isCompactValue(value);
 
   return (
     <div
       className={styles.tile}
-      data-accent={accentColor ? "true" : "false"}
+      data-accent={severityColor ? "true" : "false"}
       style={
-        accentColor
-          ? ({ "--tile-accent": accentColor } as CSSProperties)
+        severityColor
+          ? ({ "--tile-accent": severityColor } as CSSProperties)
           : undefined
       }
     >
@@ -62,15 +65,21 @@ export interface MetricGridProps {
   children: ReactNode;
 }
 
-/** Auto-fitting grid, so tiles reflow to two or three columns without media
- *  queries and never squeeze below a legible width. */
+/**
+ * Auto-fitting grid.
+ *
+ * `minmax(11rem, 1fr)` rather than 9rem: at 9rem the tiles packed four and five
+ * to a row on a wide card, which is what made the section read as congested.
+ * The wider floor gives two or three columns of comfortably sized tiles, and
+ * the row gap is larger than the column gap so the rows separate clearly.
+ */
 export function MetricGrid({ children }: MetricGridProps) {
   return (
     <div
       style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(9rem, 1fr))",
-        gap: "var(--spacing-md)",
+        gridTemplateColumns: "repeat(auto-fit, minmax(11rem, 1fr))",
+        gap: "var(--spacing-base) var(--spacing-md)",
       }}
     >
       {children}

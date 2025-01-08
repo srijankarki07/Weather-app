@@ -2,28 +2,43 @@
  * Metric tile — the "Today's Highlights" grid unit from PLAN 6.
  *
  * Each tile is a small stack: a micro-label, the value at display weight, and an
- * optional hint line. The accent rail on the left is how severity is carried
- * when a metric has one (air quality, UV); metrics without severity simply omit
- * it and the tile stays neutral.
+ * optional hint line.
+ *
+ * Severity is carried by a small dot beside the label rather than by a coloured
+ * rail down the tile's left edge. The rail was doing the same job in four
+ * different components — these tiles, the hero verdict, the nowcast and the
+ * alert banner — and at that density a coloured bar stopped reading as a signal
+ * and started reading as decoration. A dot is quieter, sits with the label it
+ * qualifies, and leaves the tile's outline intact.
  */
 
 .tile {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
+  /* Roomier than it was. The tiles were reading as a wall of numbers partly
+     because they were packed edge to edge. */
   padding: var(--spacing-base);
   border-radius: var(--rounded-md);
   background-color: var(--color-surface-soft);
-  border: 1px solid transparent;
   min-width: 0;
   /* Relative, so the tile grows with the user's text size rather than clipping
-     a long value like "Unhealthy for sensitive groups". */
-  min-height: 6.5rem;
-  justify-content: space-between;
+     a long value. */
+  min-height: 7.5rem;
+  justify-content: flex-start;
 }
 
-.tile[data-accent="true"] {
-  border-left: 3px solid var(--tile-accent, var(--color-primary));
+/* Accent dot, shown only for metrics that carry a severity. */
+.tile[data-accent="true"] .label::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 7px;
+  border-radius: var(--rounded-full);
+  background-color: var(--tile-accent, var(--color-primary));
+  /* Nudged onto the label's optical centre rather than sitting on its baseline. */
+  vertical-align: 0.08em;
 }
 
 .head {
@@ -78,61 +93,11 @@
 
 .hint {
   font-size: var(--type-caption-sm-size);
-  line-height: var(--type-caption-sm-leading);
+  line-height: 1.4;
   color: var(--color-muted);
-}
-
-/* ------------------------------------------------ activity verdicts */
-
-.activityList {
-  display: flex;
-  flex-direction: column;
-  margin-top: var(--spacing-base);
-  border-top: 1px solid var(--color-hairline-soft);
-}
-
-.activityRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-base);
-  padding: var(--spacing-sm) 0;
-  border-bottom: 1px solid var(--color-hairline-soft);
-}
-
-.activityRow:last-child {
-  border-bottom: none;
-}
-
-.activityName {
-  font-size: var(--type-body-sm-size);
-  color: var(--color-ink);
-}
-
-/*
- * Verdict pills. Colour alone does not carry the meaning — the label says
- * "Best avoided" as well — so the tint is reinforcement rather than the only
- * signal (PLAN 4.7).
- */
-.activityVerdict {
-  font-size: var(--type-caption-sm-size);
-  font-weight: 600;
-  padding: 2px 10px;
-  border-radius: var(--rounded-full);
-  border: 1px solid currentColor;
-  white-space: nowrap;
-}
-
-.activityVerdict[data-verdict="good"] {
-  color: var(--wx-status-good);
-}
-
-.activityVerdict[data-verdict="caution"] {
-  color: var(--wx-status-caution);
-}
-
-.activityVerdict[data-verdict="avoid"] {
-  color: var(--wx-status-bad);
+  /* Pins the hint to the bottom, so hint lines align across a row of tiles
+     whose values differ in height. */
+  margin-top: auto;
 }
 
 /* Trend arrow beside the hint: improving, worsening, or flat. */

@@ -1,0 +1,170 @@
+/*
+ * Air quality card.
+ *
+ * One reading, its interpretation, three pollutant bars, and the two activity
+ * verdicts that follow from it. Laid out as lines rather than a tile grid,
+ * because every piece here is a sentence or a comparison rather than a number
+ * to glance at.
+ */
+
+.summary {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-base);
+}
+
+/*
+ * The badge groups the index with its category word. The dot is the severity
+ * signal, matching the metric tiles — a filled pill behind the number would be
+ * far louder than a secondary metric deserves.
+ */
+.badge {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.aqi {
+  font-size: var(--type-display-md-size);
+  font-weight: var(--type-display-md-weight);
+  line-height: 1.1;
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--type-body-sm-size);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.category::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: var(--rounded-full);
+  background-color: var(--aqi-accent, var(--color-muted));
+}
+
+.guidance {
+  font-size: var(--type-body-sm-size);
+  line-height: 1.5;
+  color: var(--color-muted);
+  min-width: 0;
+}
+
+/* ------------------------------------------------------------ pollutants */
+
+.pollutants {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-base);
+}
+
+.pollutant {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr) 3rem;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.pollutantLabel {
+  font-size: var(--type-caption-sm-size);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.pollutantTrack {
+  height: 6px;
+  border-radius: var(--rounded-full);
+  background-color: var(--color-surface-strong);
+  overflow: hidden;
+}
+
+.pollutantBar {
+  display: block;
+  height: 100%;
+  border-radius: var(--rounded-full);
+  /* Floor so a near-zero reading is still a visible mark rather than nothing. */
+  min-width: 4px;
+}
+
+.pollutantValue {
+  font-size: var(--type-caption-sm-size);
+  color: var(--color-ink);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* --------------------------------------------------------------- activity */
+
+.activity {
+  margin-top: var(--spacing-base);
+  padding-top: var(--spacing-base);
+  border-top: 1px solid var(--color-hairline-soft);
+}
+
+.activityHeading {
+  font-size: var(--type-micro-label-size);
+  font-weight: var(--type-micro-label-weight);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+}
+
+.activityRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-base);
+  padding: var(--spacing-xs) 0;
+}
+
+.activityName {
+  font-size: var(--type-body-sm-size);
+  color: var(--color-ink);
+}
+
+.activityVerdict {
+  font-size: var(--type-caption-sm-size);
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: var(--rounded-full);
+  border: 1px solid currentColor;
+  white-space: nowrap;
+}
+
+.activityVerdict[data-verdict="good"] {
+  color: var(--wx-status-good);
+}
+
+.activityVerdict[data-verdict="caution"] {
+  color: var(--wx-status-caution);
+}
+
+.activityVerdict[data-verdict="avoid"] {
+  color: var(--wx-status-bad);
+}
+
+.activityReason {
+  font-size: var(--type-caption-sm-size);
+  line-height: 1.45;
+  color: var(--color-muted);
+  margin-top: var(--spacing-xs);
+}
+
+.unavailable {
+  font-size: var(--type-body-sm-size);
+  color: var(--color-muted);
+}
