@@ -223,8 +223,7 @@ describe("highlights", () => {
       screen.getByRole("region", { name: /today's highlights/i })
     );
 
-    // PLAN 4.2: dew point explained as comfort, UV as a burn time, air quality
-    // as health guidance.
+    // PLAN 4.2: every reading carries its interpretation, not just its value.
     expect(highlights.getByText("Feels like")).toBeInTheDocument();
     expect(highlights.getByText("Dew point 15° · Comfortable")).toBeInTheDocument();
     expect(highlights.getByText("UV index")).toBeInTheDocument();
@@ -232,20 +231,34 @@ describe("highlights", () => {
     expect(
       highlights.getByText(/Burn time: about \d+ minutes/)
     ).toBeInTheDocument();
-    expect(highlights.getByText("Air quality")).toBeInTheDocument();
-    expect(highlights.getByText(/Air quality is acceptable/i)).toBeInTheDocument();
+    expect(highlights.getByText("Wind")).toBeInTheDocument();
+    expect(highlights.getByText("Visibility")).toBeInTheDocument();
   });
 
-  it("gives a per-activity verdict", async () => {
+  it("keeps air quality and activity advice in their own card", async () => {
     mockWeatherFetch();
     render(<App />);
     await waitFor(() => expect(hero().getByText("24")).toBeInTheDocument());
 
+    /*
+     * Split out of the highlights deliberately: AQI carries a sentence of
+     * guidance and a trend, which made the metric grid read as congested.
+     */
+    const air = within(
+      screen.getByRole("region", { name: /air quality/i })
+    );
+
+    expect(air.getByText(/Air quality is acceptable/i)).toBeInTheDocument();
+    expect(air.getByText("PM2.5")).toBeInTheDocument();
+    expect(air.getByText("Going out")).toBeInTheDocument();
+    expect(air.getByText("Running")).toBeInTheDocument();
+    expect(air.getByText("Cycling")).toBeInTheDocument();
+
+    // And it is no longer in the highlights grid.
     const highlights = within(
       screen.getByRole("region", { name: /today's highlights/i })
     );
-    expect(highlights.getByText("Running")).toBeInTheDocument();
-    expect(highlights.getByText("Cycling")).toBeInTheDocument();
+    expect(highlights.queryByText("Running")).not.toBeInTheDocument();
   });
 });
 
