@@ -17,8 +17,6 @@
   backdrop-filter: blur(20px) saturate(150%);
   -webkit-backdrop-filter: blur(20px) saturate(150%);
   border: 1px solid var(--wx-glass-border);
-  /* Severity is carried on the left rail, matching the metric tiles. */
-  border-left: 4px solid var(--nowcast-accent, var(--color-primary));
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -27,6 +25,7 @@
   }
 }
 
+/* The droplet carries the severity colour now that the rail is gone. */
 .icon {
   flex-shrink: 0;
   color: var(--nowcast-accent, var(--color-primary));

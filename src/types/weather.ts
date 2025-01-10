@@ -82,6 +82,12 @@ export interface CurrentConditions {
   sunset: number;
   /** True when the location is currently between sunset and sunrise. */
   isNight: boolean;
+  /**
+   * Change in mean sea level pressure over the trailing three hours, in hPa.
+   * Computed in the assembler because it needs the previous day's readings,
+   * which the rendered hourly window no longer contains.
+   */
+  pressureChange3h?: number;
 }
 
 export interface HourlyPoint {

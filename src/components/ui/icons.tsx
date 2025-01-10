@@ -218,6 +218,18 @@ export function ChartIcon(props: IconProps) {
   );
 }
 
+/** Settings. Sliders read as "adjust these" rather than as a gauge or a clock. */
+export function SlidersIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <line x1="4" y1="8" x2="20" y2="8" />
+      <line x1="4" y1="16" x2="20" y2="16" />
+      <circle cx="9" cy="8" r="2.5" />
+      <circle cx="15" cy="16" r="2.5" />
+    </Icon>
+  );
+}
+
 export function CalendarIcon(props: IconProps) {
   return (
     <Icon {...props}>

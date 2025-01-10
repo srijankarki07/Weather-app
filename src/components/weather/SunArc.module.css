@@ -1,9 +1,13 @@
 /*
- * Sunrise / sunset arc.
+ * Daylight timeline.
  *
- * PLAN 6 asks for an arc visualisation rather than two timestamps, because the
- * useful information is *where the sun is now* — how much daylight is left —
- * not the two times in isolation.
+ * Was a half-ellipse arc on a 2:1 aspect ratio, which on a desktop card meant a
+ * ~300px-tall block to communicate one number: how much daylight is left. This
+ * is the same information on a single horizontal track, about 90px tall.
+ *
+ * The arc's only real advantage was that it looked like a sun path. A filled
+ * progress bar says the same thing — you can see how far through the day you
+ * are — without reserving a third of the viewport to do it.
  */
 
 .wrap {
@@ -12,60 +16,63 @@
   gap: var(--spacing-md);
 }
 
-.arc {
-  position: relative;
-  width: 100%;
-  /* Roughly a 2:1 aspect, which is what the arc path assumes. */
-  aspect-ratio: 2 / 1.05;
-}
-
-.svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  overflow: visible;
-}
+/* ---------------------------------------------------------------- track */
 
 .track {
-  fill: none;
-  stroke: var(--color-hairline);
-  stroke-width: 2;
-  stroke-linecap: round;
+  position: relative;
+  height: 6px;
+  margin: var(--spacing-sm) 0;
+  border-radius: var(--rounded-full);
+  background-color: var(--color-surface-strong);
 }
 
-/* The elapsed portion of the day, drawn along the same path. */
-.elapsed {
-  fill: none;
-  stroke: var(--wx-sun-accent);
-  stroke-width: 3;
-  stroke-linecap: round;
-  transition: stroke-dashoffset var(--motion-slow) var(--motion-ease);
+/* Elapsed portion of the day. */
+.fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: var(--rounded-full);
+  background-image: linear-gradient(
+    90deg,
+    var(--wx-sun-accent-soft) 0%,
+    var(--wx-sun-accent) 100%
+  );
+  transition: width var(--motion-slow) var(--motion-ease);
 }
 
-.horizon {
-  stroke: var(--color-hairline);
-  stroke-width: 1;
+/*
+ * The sun's current position. Sits above the fill's leading edge so it reads as
+ * travelling along the track rather than being clipped by it.
+ */
+.marker {
+  position: absolute;
+  top: 50%;
+  /* rem, so the indicator scales with the user's text size like everything
+     else on the track. */
+  width: 1rem;
+  height: 1rem;
+  margin-left: -0.5rem;
+  transform: translateY(-50%);
+  border-radius: var(--rounded-full);
+  background-color: var(--wx-sun-accent);
+  border: 2px solid var(--color-canvas);
+  box-shadow: var(--shadow-float);
+  transition: left var(--motion-slow) var(--motion-ease);
 }
 
-.sun {
-  fill: var(--wx-sun-accent);
+/* After dark the marker becomes a hollow ring, so the track reads as complete
+   rather than as a sun parked at the end. */
+.markerNight {
+  background-color: var(--color-canvas);
+  border-color: var(--color-muted);
 }
 
-.sunHalo {
-  fill: var(--wx-sun-accent);
-  opacity: 0.22;
-}
-
-/* Night marker: a hollow disc where the sun would be after dark. */
-.moon {
-  fill: var(--color-canvas);
-  stroke: var(--color-muted);
-  stroke-width: 2;
-}
+/* --------------------------------------------------------------- labels */
 
 .times {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--spacing-base);
 }
@@ -91,8 +98,29 @@
   text-align: right;
 }
 
-.daylight {
-  text-align: center;
+.icon {
+  color: var(--wx-sun-accent);
+  flex-shrink: 0;
+}
+
+.summary {
   font-size: var(--type-body-sm-size);
   color: var(--color-muted);
+  text-align: center;
+}
+
+/*
+ * On narrow screens the two time labels would collide, so the summary moves
+ * above the track and the labels sit under their own ends.
+ */
+@media (max-width: 420px) {
+  .time {
+    font-size: var(--type-body-sm-size);
+  }
+}
+
+/* Separates the two statements in the summary line, which are different facts
+   rather than one sentence. */
+.summaryDivider {
+  color: var(--color-hairline);
 }

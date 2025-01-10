@@ -150,6 +150,30 @@ describe("fetchWeatherBundle", () => {
     expect(urls.some((url) => url.includes("bigdatacloud"))).toBe(false);
   });
 
+  it("takes sunrise and sunset from today, not from the nearest midnight", async () => {
+    /*
+     * Regression guard. `daily.time` holds local midnights, so picking the
+     * nearest one returns *tomorrow's* entry for the whole of the afternoon —
+     * which made the daylight card claim more than 24 hours of daylight left at
+     * 5pm.
+     */
+    const forecast = buildForecastFixture();
+    mockWeatherFetch({ forecast });
+
+    const data = await fetchWeatherBundle({
+      lat: 27.7,
+      lon: 85.3,
+      label: { name: "Kathmandu" },
+    });
+
+    // The fixture puts sunrise at +6h and sunset at +18h on each day.
+    const dayLength = data.current.sunset - data.current.sunrise;
+    expect(dayLength).toBe(12 * 60 * 60 * 1000);
+
+    // And sunset must be within a day of now, not a day and a bit beyond it.
+    expect(data.current.sunset - Date.now()).toBeLessThan(24 * 60 * 60 * 1000);
+  });
+
   it("records which providers contributed", async () => {
     mockWeatherFetch({ forecast: buildForecastFixture() });
 
