@@ -158,13 +158,12 @@ export interface PressureReading {
  * on its own is not something most people can act on.
  */
 export function describePressureTrend(
-  currentHpa: number,
-  pastHpa: number | undefined
+  deltaHpa: number | undefined
 ): PressureReading {
-  if (pastHpa === undefined) {
+  if (deltaHpa === undefined) {
     return { trend: "steady", detail: "" };
   }
-  const delta = currentHpa - pastHpa;
+  const delta = deltaHpa;
   if (delta > 1.5) {
     return { trend: "rising", detail: "Rising — conditions are settling." };
   }
@@ -177,20 +176,42 @@ export function describePressureTrend(
   return { trend: "steady", detail: "Steady over the last few hours." };
 }
 
-/** Pressure change over the trailing three hours, from the hourly series. */
-export function pressureTrendFrom(
+/**
+ * Pressure change over the trailing three hours, in hPa.
+ *
+ * Takes the *raw* hourly series, which includes the previous day, and not the
+ * forecast window the UI renders — that one starts at the current hour, so
+ * every point in it is in the future and there is nothing to compare against.
+ * Computing this from the rendered series is why the pressure tile always said
+ * "no trend available".
+ */
+export function pressureDelta(
   hourly: { time: number; pressure?: number }[],
   now: number,
   currentHpa: number
-): PressureReading {
+): number | undefined {
   const threeHoursAgo = now - 3 * 60 * 60 * 1000;
   let closest: { time: number; pressure?: number } | undefined;
+
   for (const point of hourly) {
     if (point.pressure === undefined) continue;
     if (point.time > threeHoursAgo) continue;
     if (!closest || point.time > closest.time) closest = point;
   }
-  return describePressureTrend(currentHpa, closest?.pressure);
+
+  if (!closest?.pressure) return undefined;
+
+  /*
+   * The baseline has to actually be near the three-hour mark. Measured as an
+   * absolute distance, so a series that only starts half an hour ago is
+   * rejected rather than reporting a "three-hour trend" from thirty minutes of
+   * data — and one-sided, it would also have accepted a baseline from half a
+   * day back.
+   */
+  const distance = Math.abs(closest.time - threeHoursAgo);
+  if (distance > 1.5 * 60 * 60 * 1000) return undefined;
+
+  return Math.round((currentHpa - closest.pressure) * 10) / 10;
 }
 
 /* ----------------------------------------------------------- visibility */

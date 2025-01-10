@@ -5,7 +5,7 @@ import {
   describeUvIndex,
   describeVisibility,
   describeWindSpeed,
-  pressureTrendFrom,
+  pressureDelta,
 } from "./comfort";
 
 describe("describeDewPoint", () => {
@@ -92,51 +92,53 @@ describe("describeWindSpeed", () => {
 });
 
 describe("describePressureTrend", () => {
+  // Takes the change itself, not two readings: the delta has to be measured
+  // against the previous day's data, which only the assembler has.
   it("reports a rising trend", () => {
-    expect(describePressureTrend(1015, 1010).trend).toBe("rising");
+    expect(describePressureTrend(5).trend).toBe("rising");
   });
 
   it("reports a falling trend", () => {
-    expect(describePressureTrend(1005, 1012).trend).toBe("falling");
+    expect(describePressureTrend(-7).trend).toBe("falling");
   });
 
   it("treats small changes as steady", () => {
-    expect(describePressureTrend(1012, 1011).trend).toBe("steady");
+    expect(describePressureTrend(1).trend).toBe("steady");
   });
 
-  it("has no opinion without a past reading", () => {
-    const reading = describePressureTrend(1012, undefined);
+  it("has no opinion without a measurement", () => {
+    const reading = describePressureTrend(undefined);
     expect(reading.trend).toBe("steady");
     expect(reading.detail).toBe("");
   });
 
   it("explains the consequence, not just the direction", () => {
-    expect(describePressureTrend(1005, 1012).detail).toMatch(/unsettled/i);
-    expect(describePressureTrend(1015, 1010).detail).toMatch(/settling/i);
+    expect(describePressureTrend(-7).detail).toMatch(/unsettled/i);
+    expect(describePressureTrend(5).detail).toMatch(/settling/i);
   });
 });
 
-describe("pressureTrendFrom", () => {
+describe("pressureDelta", () => {
   const now = Date.parse("2024-11-10T12:00:00Z");
   const hour = 3_600_000;
 
-  it("picks the reading closest to three hours ago", () => {
+  it("measures the change against the reading three hours back", () => {
     const hourly = [
       { time: now - 1 * hour, pressure: 1011 },
       { time: now - 3 * hour, pressure: 1004 },
       { time: now - 6 * hour, pressure: 1000 },
     ];
-    // Current 1012 against 1004 three hours ago is a rise.
-    expect(pressureTrendFrom(hourly, now, 1012).trend).toBe("rising");
+    // 1012 now against 1004 three hours ago.
+    expect(pressureDelta(hourly, now, 1012)).toBe(8);
   });
 
   it("ignores entries inside the three-hour window", () => {
     const hourly = [
       { time: now - 30 * 60 * 1000, pressure: 1000 },
-      { time: now - 5 * hour, pressure: 1010 },
+      { time: now - 3 * hour, pressure: 1010 },
     ];
-    // The 30-minute-old entry is too recent, so the 5-hour-old one is used.
-    expect(pressureTrendFrom(hourly, now, 1000).trend).toBe("falling");
+    // The 30-minute-old entry is too recent to be the baseline.
+    expect(pressureDelta(hourly, now, 1004)).toBe(-6);
   });
 
   it("skips points with no pressure reading", () => {
@@ -144,11 +146,26 @@ describe("pressureTrendFrom", () => {
       { time: now - 3 * hour, pressure: undefined },
       { time: now - 4 * hour, pressure: 1010 },
     ];
-    expect(pressureTrendFrom(hourly, now, 1000).trend).toBe("falling");
+    // The null reading at the three-hour mark is skipped and the four-hour one
+    // used instead, which is close enough to stand in for it.
+    expect(pressureDelta(hourly, now, 1000)).toBe(-10);
   });
 
-  it("returns steady when there is no history at all", () => {
-    expect(pressureTrendFrom([], now, 1012).trend).toBe("steady");
+  it("refuses a baseline that is too recent", () => {
+    // Only half an hour of history: that is not a three-hour trend.
+    const hourly = [{ time: now - 30 * 60 * 1000, pressure: 1008 }];
+    expect(pressureDelta(hourly, now, 1012)).toBeUndefined();
+  });
+
+  it("returns nothing when there is no history at all", () => {
+    expect(pressureDelta([], now, 1012)).toBeUndefined();
+  });
+
+  it("refuses a baseline that is too far in the past", () => {
+    // A three-hour delta measured across twelve hours is not a three-hour
+    // delta, and reporting one would be worse than reporting nothing.
+    const hourly = [{ time: now - 12 * hour, pressure: 1000 }];
+    expect(pressureDelta(hourly, now, 1012)).toBeUndefined();
   });
 });
 

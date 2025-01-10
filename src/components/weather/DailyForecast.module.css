@@ -62,12 +62,12 @@
 }
 
 /*
- * Today's bar is outlined as well as tinted, so the highlight does not rely on
- * colour alone (PLAN 4.7).
+ * Today's row is identified by its label — set in the accent and bold — rather
+ * than by decorating the bar. An outlined range bar drew a red rectangle around
+ * a green one, which read as two competing signals for one fact.
  */
 .todayBar {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 1px;
+  /* Kept as a hook; the emphasis lives on `.today .day` above. */
 }
 
 /* ------------------------------------------------------------ readings */

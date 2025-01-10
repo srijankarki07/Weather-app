@@ -14,8 +14,13 @@
   gap: var(--spacing-md);
   padding: var(--spacing-base) var(--spacing-lg);
   border-radius: var(--rounded-md);
-  border: 1px solid var(--alert-border, var(--color-hairline));
-  border-left: 4px solid var(--alert-accent, var(--color-primary));
+  /*
+   * A full outline and a tinted surface, rather than a coloured rail down one
+   * edge. Alerts still need to outrank everything on the page; a complete
+   * border does that more clearly than a bar, and it is the same treatment in
+   * every severity so the colour is the only thing that changes.
+   */
+  border: 1px solid var(--alert-accent, var(--color-hairline));
   background-color: var(--alert-surface, var(--color-surface-soft));
 }
 
@@ -102,19 +107,16 @@
 .banner[data-severity="minor"] {
   --alert-accent: var(--wx-alert-minor);
   --alert-surface: var(--wx-alert-minor-surface);
-  --alert-border: var(--wx-alert-minor);
 }
 
 .banner[data-severity="moderate"] {
   --alert-accent: var(--wx-alert-moderate);
   --alert-surface: var(--wx-alert-moderate-surface);
-  --alert-border: var(--wx-alert-moderate);
 }
 
 .banner[data-severity="severe"] {
   --alert-accent: var(--wx-alert-severe);
   --alert-surface: var(--wx-alert-severe-surface);
-  --alert-border: var(--wx-alert-severe);
   /* White on the accent, so the text flips with it. */
   --color-body: #ffffff;
   --color-ink: #ffffff;
@@ -124,7 +126,6 @@
 .banner[data-severity="extreme"] {
   --alert-accent: var(--wx-alert-extreme);
   --alert-surface: var(--wx-alert-extreme-surface);
-  --alert-border: var(--wx-alert-extreme);
   --color-body: #ffffff;
   --color-ink: #ffffff;
   --color-muted: rgb(255 255 255 / 82%);

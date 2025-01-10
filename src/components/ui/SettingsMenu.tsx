@@ -10,7 +10,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import styles from "./SettingsMenu.module.css";
 import { IconButton, Button } from "./Button";
-import { GaugeIcon } from "../ui/icons";
+import { SlidersIcon } from "../ui/icons";
 import { THEME_OPTIONS } from "../../lib/theme";
 import type { UnitSystem, UserPreferences } from "../../types/weather";
 
@@ -76,7 +76,7 @@ export function SettingsMenu({
         aria-haspopup="dialog"
         onClick={() => setOpen((prev) => !prev)}
       >
-        <GaugeIcon size={20} />
+        <SlidersIcon size={20} />
       </IconButton>
 
       {open && (
