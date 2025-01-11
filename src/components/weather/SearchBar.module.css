@@ -213,6 +213,45 @@
   }
 }
 
+/*
+ * Narrow screens.
+ *
+ * Four controls share one 390px row, and at the full desktop sizing the search
+ * field was left about 180px — not enough for its own placeholder, which
+ * truncated to "Search for a cit". Trimming the gaps, the field's inset and the
+ * orb buys back enough for the placeholder to fit whole.
+ */
+@media (max-width: 600px) {
+  .inner {
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--layout-gutter);
+  }
+
+  .field {
+    height: 3rem;
+    padding-left: var(--spacing-base);
+  }
+
+  /* The orb stays a comfortable target inside a 48px-tall field. */
+  .orb {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .locationButton {
+    height: 3rem;
+    padding: 0 var(--spacing-sm);
+  }
+}
+
+/* Below this the wordmark glyph costs more than the branding is worth, and the
+   placeholder needs the room. */
+@media (max-width: 430px) {
+  .wordmark {
+    display: none;
+  }
+}
+
 .spinner {
   animation: spin 900ms linear infinite;
 }

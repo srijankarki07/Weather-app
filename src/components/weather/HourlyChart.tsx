@@ -26,6 +26,7 @@ import {
 import styles from "./HourlyChart.module.css";
 import { Card } from "../ui/Card";
 import { useChartColors } from "../../hooks/useChartColors";
+import { useElementWidth } from "../../hooks/useElementWidth";
 import {
   convertTemperature,
   formatTemperature,
@@ -35,15 +36,22 @@ import {
 import { formatClockTime, formatHourLabel, formatWeekday } from "../../lib/time";
 import type { UnitSystem, WeatherData } from "../../types/weather";
 
-/** Pixels per hour. Below roughly 56 the axis labels start colliding. */
-const HOUR_WIDTH = 64;
-const CHART_HEIGHT = 220;
+/**
+ * Roughly how much horizontal room one hour wants before its axis label starts
+ * colliding with the next. Used to pick how many hours fit, not to size the
+ * chart — the chart fills its container exactly.
+ */
+const IDEAL_HOUR_WIDTH = 62;
+const MIN_HOURS = 8;
+const MAX_HOURS = 24;
+const CHART_HEIGHT = 210;
 
 /**
- * Bars are plotted against a `[0, 100]` axis but scaled into the lower third,
- * so a 100% chance of rain does not draw a bar through the temperature curve.
+ * Bars are plotted against a `[0, 100]` axis but scaled into the lower part, so
+ * a 100% chance of rain does not draw a bar straight through the temperature
+ * curve.
  */
-const BAR_SCALE = 0.33;
+const BAR_SCALE = 0.45;
 
 export interface HourlyChartProps {
   data: WeatherData;
@@ -66,10 +74,23 @@ interface ChartPoint {
   precipitationMm: number;
 }
 
-export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
+export function HourlyChart({ data, units, hours }: HourlyChartProps) {
   const colors = useChartColors();
   const { hourly, location, current } = data;
   const timezone = location.timezone;
+  const [containerRef, containerWidth] = useElementWidth<HTMLDivElement>();
+
+  /*
+   * How many hours to plot is derived from the space available rather than
+   * fixed. A fixed 24 was what produced the horizontal scrollbar: at 64px per
+   * hour the chart was 1536px wide inside a ~1250px card, every time.
+   */
+  const visibleHours =
+    hours ??
+    Math.max(
+      MIN_HOURS,
+      Math.min(MAX_HOURS, Math.floor(containerWidth / IDEAL_HOUR_WIDTH))
+    );
 
   const points = useMemo<ChartPoint[]>(() => {
     const now = current.observedAt;
@@ -78,7 +99,7 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
         // Drop the hour in the past that exists only to give the curve a left
         // edge; the chart looks forward.
         .filter((point) => point.time >= now - 30 * 60 * 1000)
-        .slice(0, hours)
+        .slice(0, visibleHours)
         .map((point) => {
           const probability = Math.round(point.precipitationProbability * 100);
           return {
@@ -96,11 +117,11 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
           };
         })
     );
-  }, [hourly, current.observedAt, hours, timezone, units]);
+  }, [hourly, current.observedAt, visibleHours, timezone, units]);
 
   if (points.length === 0) {
     return (
-      <Card glass title="Next 24 hours" titleId="hourly-chart-heading">
+      <Card glass title="Hourly forecast" titleId="hourly-chart-heading">
         <p className={styles.empty}>No hourly data for this location.</p>
       </Card>
     );
@@ -133,7 +154,6 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
         )}.`
       : "Precipitation is unlikely.");
 
-  const width = points.length * HOUR_WIDTH;
   // Aim for roughly eight labels regardless of how many hours are plotted.
   const labelInterval = Math.max(0, Math.ceil(points.length / 8) - 1);
 
@@ -144,15 +164,13 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
       subtitle="Temperature and chance of rain"
       titleId="hourly-chart-heading"
     >
-      <div
-        className={styles.scroller}
-        /* A keyboard user needs to be able to scroll this region, which
-           `overflow: auto` alone does not grant. */
-        tabIndex={0}
-        role="group"
-        aria-label="Hourly forecast chart, horizontally scrollable"
-      >
-        <div className={styles.canvas} style={{ width }} aria-hidden="true">
+      <div className={styles.chartArea} ref={containerRef}>
+        {/*
+          No horizontal scroll. The chart measures its container and fits, so
+          the only thing a scrollbar added was a UI affordance for a problem
+          that should not exist.
+        */}
+        <div className={styles.canvas} aria-hidden="true">
           {/*
             Fixed width rather than `ResponsiveContainer`. The chart is already
             sized deliberately — hours times pixels-per-hour — and letting a
@@ -160,7 +178,7 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
             `ResizeObserver` dependency for no benefit.
           */}
           <ComposedChart
-            width={width}
+            width={Math.max(320, containerWidth)}
             height={CHART_HEIGHT}
             data={points}
             /*
@@ -171,7 +189,10 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
              * the complete alternative.
              */
             accessibilityLayer={false}
-            margin={{ top: 28, right: 16, bottom: 4, left: 16 }}
+            /* The low annotation sits below the curve, and the curve's lowest
+               point sits near the axis — without the extra bottom margin the
+               two labels overlap. */
+            margin={{ top: 28, right: 16, bottom: 22, left: 16 }}
           >
               <defs>
                 {/*
@@ -212,10 +233,12 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
                 directly with its high and low, and a visible numeric axis
                 competing with the precipitation scale is noise.
               */}
+              {/* Two degrees of headroom, not four: a wider domain on a
+                  10-degree day leaves most of the card empty. */}
               <YAxis
                 yAxisId="temp"
                 hide
-                domain={["dataMin - 4", "dataMax + 4"]}
+                domain={["dataMin - 2", "dataMax + 2"]}
               />
               <YAxis yAxisId="precip" hide domain={[0, 100]} />
 
@@ -258,6 +281,15 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
                 fill={colors.precipitationSoft}
                 radius={[3, 3, 0, 0]}
                 maxBarSize={14}
+                /*
+                 * Animation off. Beyond never completing in a headless render —
+                 * which left the bars drawn at zero height — PLAN 4.6 asks for
+                 * "subtle transitions on data update, not decorative
+                 * animations", and redrawing the whole curve every fifteen
+                 * minutes when the data has barely moved is exactly the
+                 * decorative case. It also costs main-thread time on mount.
+                 */
+                isAnimationActive={false}
               />
 
               <Line
@@ -269,10 +301,19 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
                 dot={false}
                 activeDot={{ r: 4, fill: colors.temperature }}
                 fill="url(#hourlyTempFill)"
+                isAnimationActive={false}
               />
 
-              {/* The anchor the rest of the chart is read against. */}
+              {/*
+                The anchor the rest of the chart is read against.
+                
+                `yAxisId` is required, not optional: a reference element with no
+                axis id defaults to `0`, and this chart's axes are "temp" and
+                "precip". Without it Recharts silently renders nothing, which is
+                why the "Now" marker and the high/low annotations were missing.
+              */}
               <ReferenceLine
+                yAxisId="temp"
                 x={points[0].label}
                 stroke={colors.nowMarker}
                 strokeWidth={1.5}
@@ -288,6 +329,7 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
 
               {/* High and low annotated on the curve itself, per PLAN 4.5. */}
               <ReferenceDot
+                yAxisId="temp"
                 x={highPoint.label}
                 y={highPoint.temperature}
                 r={4}
@@ -303,6 +345,7 @@ export function HourlyChart({ data, units, hours = 24 }: HourlyChartProps) {
                 }}
               />
               <ReferenceDot
+                yAxisId="temp"
                 x={lowPoint.label}
                 y={lowPoint.temperature}
                 r={4}

@@ -60,47 +60,56 @@ export function HeroCard({ data, units }: HeroCardProps) {
         {`Current conditions in ${place}`}
       </h1>
 
+      {/*
+        Two halves. On a wide screen they sit side by side and the card fills
+        its width; below the breakpoint they stack. The split is explicit in the
+        markup rather than left to grid auto-placement, which previously put the
+        location opposite the temperature and the facts under the icon by
+        accident.
+      */}
       <div className={styles.hero}>
-        <div className={styles.top}>
-          <div>
+        <div className={styles.primary}>
+          <div className={styles.top}>
             <div className={styles.reading}>
               <span className={styles.temperature}>
                 {formatTemperature(current.temperature, units)}
               </span>
-              <span className={styles.unit}>°{temperatureSymbol(units).slice(1)}</span>
+              <span className={styles.unit}>
+                °{temperatureSymbol(units).slice(1)}
+              </span>
             </div>
-            <p className={styles.description}>{current.description}</p>
+            <ConditionIcon
+              className={styles.icon}
+              condition={current.condition}
+              isNight={current.isNight}
+              size="5.5rem"
+              label={iconLabel}
+            />
           </div>
-          <ConditionIcon
-            className={styles.icon}
-            condition={current.condition}
-            isNight={current.isNight}
-            size="5.5rem"
-            label={iconLabel}
-          />
+          <p className={styles.description}>{current.description}</p>
         </div>
 
-        <p className={styles.place}>
-          <LocationIcon className={styles.placeIcon} size={16} />
-          <span>{place}</span>
-        </p>
+        <div className={styles.secondary}>
+          <p className={styles.place}>
+            <LocationIcon className={styles.placeIcon} size={16} />
+            <span>{place}</span>
+          </p>
 
-        <div className={styles.facts}>
-          <span>
-            Feels like {formatTemperatureShort(current.feelsLike, units)}
-          </span>
-          <span className={styles.factDivider} aria-hidden="true" />
-          <span>
-            {formatClockTime(current.observedAt, timezone)} local
-          </span>
-          <span className={styles.factDivider} aria-hidden="true" />
-          <span>{formatLongDate(current.observedAt, timezone)}</span>
+          <div className={styles.facts}>
+            <span>
+              Feels like {formatTemperatureShort(current.feelsLike, units)}
+            </span>
+            <span className={styles.factDivider} aria-hidden="true" />
+            <span>{formatClockTime(current.observedAt, timezone)} local</span>
+            <span className={styles.factDivider} aria-hidden="true" />
+            <span>{formatLongDate(current.observedAt, timezone)}</span>
+          </div>
+
+          <p className={styles.verdict}>
+            <span className={styles.verdictHeadline}>{verdict.headline}</span>
+            <span className={styles.verdictDetail}>{verdict.detail}</span>
+          </p>
         </div>
-
-        <p className={styles.verdict}>
-          <span className={styles.verdictHeadline}>{verdict.headline}</span>
-          <span className={styles.verdictDetail}>{verdict.detail}</span>
-        </p>
       </div>
     </Card>
   );

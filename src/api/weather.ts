@@ -24,6 +24,7 @@ import type {
   WeatherData,
 } from "../types/weather";
 import { dateKeyInZone } from "../lib/time";
+import { pressureDelta } from "../lib/comfort";
 import {
   conditionLabel,
   dewPointFromHumidity,
@@ -112,7 +113,18 @@ function buildCurrent(
     valueAt(hourly.dew_point_2m, hourIndex) ??
     dewPointFromHumidity(temperature, humidity);
 
-  const todayIndex = nearestIndex(daily.time, now);
+  /*
+   * Today's entry, matched by local calendar date.
+   *
+   * This used to be `nearestIndex(daily.time, now)`, which is wrong: `daily.time`
+   * holds local *midnights*, so after midday the nearest one is tomorrow's and
+   * sunrise/sunset silently became tomorrow's for the rest of the day. It
+   * surfaced as a daylight card claiming "24 hours of daylight left" at 5pm.
+   */
+  const todayKey = dateKeyInZone(now, raw.timezone);
+  const todayIndex = daily.time.findIndex(
+    (time) => dateKeyInZone(time, raw.timezone) === todayKey
+  );
   const sunrise = valueAt(daily.sunrise, todayIndex) ?? now;
   const sunset = valueAt(daily.sunset, todayIndex) ?? now;
   const condition = wmoToCondition(current.weather_code);
@@ -140,6 +152,14 @@ function buildCurrent(
       current.is_day !== null
         ? current.is_day === 0
         : isNightAt(now, sunrise, sunset),
+    pressureChange3h: pressureDelta(
+      hourly.time.map((time, index) => ({
+        time,
+        pressure: valueAt(hourly.pressure_msl, index),
+      })),
+      now,
+      current.pressure_msl ?? 0
+    ),
   };
 }
 
