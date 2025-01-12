@@ -5,7 +5,6 @@
   "cleanUrls": true,
   "headers": [
     {
-      "comment": "Hashed build assets are immutable; cache them for a year. The first Lighthouse audit scored 50/100 on caching purely because a plain static server sends no Cache-Control at all.",
       "source": "/static/(.*)",
       "headers": [
         {
@@ -15,32 +14,47 @@
       ]
     },
     {
-      "comment": "The service worker must never be cached, or a client can get stuck on an old version that never sees its own replacement.",
       "source": "/service-worker.js",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" },
-        { "key": "Service-Worker-Allowed", "value": "/" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
       ]
     },
     {
-      "comment": "The shell and the manifest are revalidated so a new deploy is picked up promptly.",
       "source": "/(index.html|manifest.json)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
       ]
     },
     {
-      "comment": "Icons and fonts change rarely and are not content-hashed.",
       "source": "/(.*)\\.(png|ico|svg|woff2)",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=604800" }
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=604800"
+        }
       ]
     },
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
         {
           "key": "Permissions-Policy",
           "value": "geolocation=(self), camera=(), microphone=()"
@@ -48,5 +62,10 @@
       ]
     }
   ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
 }
